@@ -12,12 +12,13 @@ Padding::Padding() :
 	
 }
 
-void Padding::setAll(int padding)
+Padding::Padding(int paddingTop, int paddingLeft, int paddingRight, int paddingBottom) :
+	m_left(paddingLeft),
+	m_right(paddingRight),
+	m_top(paddingTop),
+	m_bottom(paddingBottom)
 {
-	m_left = padding;
-	m_right = padding;
-	m_top = padding;
-	m_bottom = padding;
+	
 }
 
 }

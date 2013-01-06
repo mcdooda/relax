@@ -194,18 +194,34 @@ Element* Element::fromXML(const char* xml)
 
 void Element::init()
 {
-	attrSetters["anchorx"] = &Element::setAttrAnchorX;
-	attrSetters["anchory"] = &Element::setAttrAnchorY;
+	attrSetters["anchor"] = &Element::setAttrAnchor;
+	attrSetters["anchor-x"] = &Element::setAttrAnchorX;
+	attrSetters["anchor-y"] = &Element::setAttrAnchorY;
 	attrSetters["width"] = &Element::setAttrWidth;
 	attrSetters["height"] = &Element::setAttrHeight;
-	attrSetters["x"] = &Element::setAttrX;
-	attrSetters["y"] = &Element::setAttrY;
+	attrSetters["position"] = &Element::setAttrPosition;
+	attrSetters["position-x"] = &Element::setAttrPositionX;
+	attrSetters["position-y"] = &Element::setAttrPositionY;
 	attrSetters["color"] = &Element::setAttrColor;
+	attrSetters["color-red"] = &Element::setAttrColorRed;
+	attrSetters["color-green"] = &Element::setAttrColorGreen;
+	attrSetters["color-blue"] = &Element::setAttrColorBlue;
+	attrSetters["color-alpha"] = &Element::setAttrColorAlpha;
 	attrSetters["padding"] = &Element::setAttrPadding;
 	attrSetters["padding-left"] = &Element::setAttrPaddingLeft;
 	attrSetters["padding-right"] = &Element::setAttrPaddingRight;
 	attrSetters["padding-top"] = &Element::setAttrPaddingTop;
 	attrSetters["padding-bottom"] = &Element::setAttrPaddingBottom;
+}
+
+void Element::setAttrAnchor(std::string attrValue)
+{
+	std::string anchorX, anchorY;
+	std::istringstream ss(attrValue);
+	ss >> anchorX;
+	ss >> anchorY;
+	setAttrAnchorX(anchorX);
+	setAttrAnchorY(anchorY);
 }
 
 void Element::setAttrAnchorX(std::string attrValue)
@@ -244,10 +260,20 @@ void Element::setAttrAnchorY(std::string attrValue)
 	setAnchorY(anchor);
 }
 
+void Element::setAttrSize(std::string attrValue)
+{
+	std::string width, height;
+	std::istringstream ss(attrValue);
+	ss >> width;
+	ss >> height;
+	setAttrWidth(width);
+	setAttrHeight(height);
+}
+
 void Element::setAttrWidth(std::string attrValue)
 {
 	if (attrValue == "auto")
-		m_size.setWidthAuto();
+		setWidthAuto();
 	
 	else
 	{
@@ -257,14 +283,14 @@ void Element::setAttrWidth(std::string attrValue)
 		if (ss.fail())
 			throw Exception();
 			
-		m_size.setWidth(width);
+		setWidth(width);
 	}
 }
 
 void Element::setAttrHeight(std::string attrValue)
 {
 	if (attrValue == "auto")
-		m_size.setHeightAuto();
+		setHeightAuto();
 	
 	else
 	{
@@ -274,11 +300,23 @@ void Element::setAttrHeight(std::string attrValue)
 		if (ss.fail())
 			throw Exception();
 			
-		m_size.setHeight(height);
+		setHeight(height);
 	}
 }
 
-void Element::setAttrX(std::string attrValue)
+void Element::setAttrPosition(std::string attrValue)
+{
+	int x, y;
+	std::istringstream ss(attrValue);
+	ss >> x;
+	ss >> y;
+	if (ss.fail())
+		throw Exception();
+		
+	setPosition(Vector2(x, y));
+}
+
+void Element::setAttrPositionX(std::string attrValue)
 {
 	int x;
 	std::istringstream ss(attrValue);
@@ -286,10 +324,10 @@ void Element::setAttrX(std::string attrValue)
 	if (ss.fail())
 		throw Exception();
 		
-	m_relativePosition.setX(x);
+	setX(x);
 }
 
-void Element::setAttrY(std::string attrValue)
+void Element::setAttrPositionY(std::string attrValue)
 {
 	int y;
 	std::istringstream ss(attrValue);
@@ -297,7 +335,7 @@ void Element::setAttrY(std::string attrValue)
 	if (ss.fail())
 		throw Exception();
 		
-	m_relativePosition.setY(y);
+	setY(y);
 }
 
 void Element::setAttrColor(std::string attrValue)
@@ -311,18 +349,65 @@ void Element::setAttrColor(std::string attrValue)
 	if (ss.fail())
 		throw Exception();
 		
-	m_color = Color(r, g, b, a);
+	setColor(Color(r, g, b, a));
+}
+
+void Element::setAttrColorRed(std::string attrValue)
+{
+	unsigned int r;
+	std::istringstream ss(attrValue);
+	ss >> r;
+	if (ss.fail())
+		throw Exception();
+		
+	setRed(r);
+}
+
+void Element::setAttrColorGreen(std::string attrValue)
+{
+	unsigned int g;
+	std::istringstream ss(attrValue);
+	ss >> g;
+	if (ss.fail())
+		throw Exception();
+		
+	setGreen(g);
+}
+
+void Element::setAttrColorBlue(std::string attrValue)
+{
+	unsigned int b;
+	std::istringstream ss(attrValue);
+	ss >> b;
+	if (ss.fail())
+		throw Exception();
+		
+	setBlue(b);
+}
+
+void Element::setAttrColorAlpha(std::string attrValue)
+{
+	unsigned int a;
+	std::istringstream ss(attrValue);
+	ss >> a;
+	if (ss.fail())
+		throw Exception();
+		
+	setAlpha(a);
 }
 
 void Element::setAttrPadding(std::string attrValue)
 {
-	int padding;
+	int paddingTop, paddingLeft, paddingRight, paddingBottom;
 	std::istringstream ss(attrValue);
-	ss >> padding;
+	ss >> paddingTop;
+	ss >> paddingLeft;
+	ss >> paddingRight;
+	ss >> paddingBottom;
 	if (ss.fail())
 		throw Exception();
 		
-	m_padding.setAll(padding);
+	setPadding(Padding(paddingTop, paddingLeft, paddingRight, paddingBottom));
 }
 
 void Element::setAttrPaddingLeft(std::string attrValue)
@@ -333,7 +418,7 @@ void Element::setAttrPaddingLeft(std::string attrValue)
 	if (ss.fail())
 		throw Exception();
 		
-	m_padding.setLeft(paddingLeft);
+	setPaddingLeft(paddingLeft);
 }
 
 void Element::setAttrPaddingRight(std::string attrValue)
@@ -344,7 +429,7 @@ void Element::setAttrPaddingRight(std::string attrValue)
 	if (ss.fail())
 		throw Exception();
 		
-	m_padding.setRight(paddingRight);
+	setPaddingRight(paddingRight);
 }
 
 void Element::setAttrPaddingTop(std::string attrValue)
@@ -355,7 +440,7 @@ void Element::setAttrPaddingTop(std::string attrValue)
 	if (ss.fail())
 		throw Exception();
 		
-	m_padding.setTop(paddingTop);
+	setPaddingTop(paddingTop);
 }
 
 void Element::setAttrPaddingBottom(std::string attrValue)
@@ -366,7 +451,7 @@ void Element::setAttrPaddingBottom(std::string attrValue)
 	if (ss.fail())
 		throw Exception();
 		
-	m_padding.setAll(paddingBottom);
+	setPaddingBottom(paddingBottom);
 }
 
 }

@@ -8,8 +8,7 @@ class Padding
 {
 	public:
 		Padding();
-		
-		void setAll(int padding);
+		Padding(int paddingTop, int paddingLeft, int paddingRight, int paddingBottom);
 		
 		inline void setLeft(int left) { m_left = left; }
 		inline void setRight(int right) { m_right = right; }

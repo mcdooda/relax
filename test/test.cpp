@@ -13,9 +13,9 @@ int main(int argc, char* argv[])
 		Relax* r = new Relax();
 		{
 			Element* e1 = Element::fromXML(
-				"<element1 width='400' height='400' padding='10' color='255 0 0 255' anchorx='center'>"
-					"<element2 width='300' height='auto' color='0 255 0 255' />"
-					"<element3 width='auto' height='300' color='0 0 255 255' />"
+				"<element1 width='400' height='400' padding='10 10 10 10' anchor-x='center'>"
+					"<element2 width='300' color='0 255 0 255' />"
+					"<element3 height='300' color='0 0 255 255' />"
 				"</element1>"
 			);
 			r->addChild(e1);
