@@ -9,6 +9,8 @@
 #include "color.h"
 #include "padding.h"
 #include "size.h"
+#include "rectangle.h"
+#include "rotation.h"
 
 namespace relax
 {
@@ -28,9 +30,14 @@ class Element
 		
 		typedef void (Element::*AttrSetter)(std::string attrValue);
 	
+	protected:
+		Element(std::string tag);
+		
 	public:
-		Element();
+		Element(std::string tag, Element* window);
 		virtual ~Element();
+		
+		inline const std::string& getTag() const { return m_tag; }
 		
 		void addChild(Element* child);
 		inline Element* getParent() { return m_parent; }
@@ -43,15 +50,26 @@ class Element
 		inline void setSize(Size size) { m_size = size; }
 		inline void setWidthAuto() { m_size.setWidthAuto(); }
 		inline void setHeightAuto() { m_size.setHeightAuto(); }
-		inline void setWidth(int width) { m_size.setWidth(width); }
-		inline void setHeight(int height) { m_size.setHeight(height); }
+		inline void setWidth(float width) { m_size.setWidth(width); }
+		inline void setHeight(float height) { m_size.setHeight(height); }
 		inline Size getSize() const { return m_size; }
-		inline Vector2 getRealSize() const { return m_realSize; }
+		inline Vector2 getComputedSize() const { return m_rectangle.getSize(); }
+		inline float getComputedWidth() const { return m_rectangle.getWidth(); }
+		inline float getComputedHeight() const { return m_rectangle.getHeight(); }
 		
 		inline void setPosition(Vector2 position) { m_relativePosition = position; }
-		inline void setX(int x) { m_relativePosition.setX(x); }
-		inline void setY(int y) { m_relativePosition.setY(y); }
+		inline void setX(float x) { m_relativePosition.setX(x); }
+		inline void setY(float y) { m_relativePosition.setY(y); }
 		inline Vector2 getPosition() const { return m_relativePosition; }
+		
+		/*
+		inline void setRotation(Rotation rotation) { m_rotation = rotation; }
+		inline void setRotationCenter(Vector2 rotationCenter) { m_rotation.setCenter(rotationCenter); }
+		inline void setRotationCenterX(float centerX) { m_rotation.setCenterX(centerX); }
+		inline void setRotationCenterY(float centerY) { m_rotation.setCenterY(centerY); }
+		inline void setRotationAngle(float angle) { m_rotation.setAngle(angle); }
+		inline Rotation getRotation() const { return m_rotation; }
+		*/
 		
 		inline void setColor(Color color) { m_color = color; }
 		inline void setRed(unsigned char r) { m_color.setRed(r); }
@@ -61,28 +79,30 @@ class Element
 		inline Color getColor() const { return m_color; }
 		
 		inline void setPadding(Padding padding) { m_padding = padding; }
-		inline void setPaddingLeft(int paddingLeft) { m_padding.setLeft(paddingLeft); }
-		inline void setPaddingRight(int paddingRight) { m_padding.setRight(paddingRight); }
-		inline void setPaddingTop(int paddingTop) { m_padding.setTop(paddingTop); }
-		inline void setPaddingBottom(int paddingBottom) { m_padding.setBottom(paddingBottom); }
+		inline void setPaddingLeft(float paddingLeft) { m_padding.setLeft(paddingLeft); }
+		inline void setPaddingRight(float paddingRight) { m_padding.setRight(paddingRight); }
+		inline void setPaddingTop(float paddingTop) { m_padding.setTop(paddingTop); }
+		inline void setPaddingBottom(float paddingBottom) { m_padding.setBottom(paddingBottom); }
 		inline Padding getPadding() const { return m_padding; }
 		
 		void setAttribute(std::string attrName, std::string attrValue);
 		
 		virtual void render();
 		
-		static Element* fromXML(const char* xml);
-		
 	protected:
+		Element* m_window;
+		std::string m_tag;
 		Element* m_parent;
 		std::list<Element*> m_children;
 		int m_anchor;
 		Vector2 m_relativePosition;
-		Vector2 m_absolutePosition;
-		Vector2 m_realSize;
+		Rectangle m_rectangle;
+		//Rotation m_rotation;
 		Color m_color;
 		Size m_size;
 		Padding m_padding;
+		
+		float m_vertices[8];
 		
 	protected:
 		void renderChildren();
@@ -97,12 +117,20 @@ class Element
 		void setAttrAnchorY(std::string attrValue);
 		
 		void setAttrSize(std::string attrValue);
-		void setAttrWidth(std::string attrValue);
-		void setAttrHeight(std::string attrValue);
+		void setAttrSizeX(std::string attrValue);
+		void setAttrSizeY(std::string attrValue);
 		
 		void setAttrPosition(std::string attrValue);
 		void setAttrPositionX(std::string attrValue);
 		void setAttrPositionY(std::string attrValue);
+		
+		/*
+		void setAttrRotation(std::string attrValue);
+		void setAttrRotationCenter(std::string attrValue);
+		void setAttrRotationCenterX(std::string attrValue);
+		void setAttrRotationCenterY(std::string attrValue);
+		void setAttrRotationAngle(std::string attrValue);
+		*/
 		
 		void setAttrColor(std::string attrValue);
 		void setAttrColorRed(std::string attrValue);

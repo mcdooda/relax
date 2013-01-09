@@ -7,20 +7,30 @@ namespace relax
 class Vector2
 {
 	public:
-		Vector2(int x, int y);
 		Vector2();
+		Vector2(float x, float y);
 		
-		inline void setX(int x) { m_x = x; }
-		inline void setY(int y) { m_y = y; }
+		inline void setX(float x) { m_x = x; }
+		inline void setY(float y) { m_y = y; }
 		
-		inline int getX() const { return m_x; }
-		inline int getY() const { return m_y; }
+		inline float getX() const { return m_x; }
+		inline float getY() const { return m_y; }
+		
+		void setR(float r);
+		float getR();
+		float getRSq();
+		
+		void setTheta(float theta);
+		float getTheta();
 		
 		inline Vector2 operator+(const Vector2& v) { return Vector2(m_x + v.m_x, m_y + v.m_y); }
+		inline Vector2 operator-(const Vector2& v) { return Vector2(m_x - v.m_x, m_y - v.m_y); }
+		inline void operator+=(const Vector2& v) { m_x += v.m_x; m_y += v.m_y; }
+		inline void operator-=(const Vector2& v) { m_x -= v.m_x; m_y -= v.m_y; }
 		
 	private:
-		int m_x;
-		int m_y;
+		float m_x;
+		float m_y;
 };
 	
 }

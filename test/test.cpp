@@ -10,29 +10,31 @@ int main(int argc, char* argv[])
 	{
 		Relax::init();
 		
-		Relax* r = new Relax();
+		Relax r;
 		{
-			Element* e1 = Element::fromXML(
-				"<element1 width='400' height='400' padding='10 10 10 10' anchor-x='center'>"
-					"<element2 width='300' color='0 255 0 255' />"
-					"<element3 height='300' color='0 0 255 255' />"
-				"</element1>"
+			Element* e1 = r.elementFromXML(
+				"<block size='300 300' padding='5 5 5 5' anchor='center center'>"
+					"<block size-x='200' anchor-x='center' color='0 255 0 255' />"
+					"<block size-y='200' anchor-y='center' color='0 0 255 128' padding='10 10 10 10'>"
+						"<block color-alpha='128'>Texte</block>"
+					"</block>"
+				"</block>"
 			);
-			r->addChild(e1);
+			r.addChild(e1);
 		}
 		
-		r->update();
+		r.update();
 		
-		while (!!*r)
+		while (!!r)
 		{
-			char* keys = r->pumpEvents();
-			if (keys[SDLK_ESCAPE])
-				r->close();
+			r.pumpEvents();
 			
-			r->render();
+			if (r.isPressed(K(ESCAPE)))
+				r.close();
+			
+			r.render();
 		}
 		
-		delete r;
 		Relax::quit();
 	}
 	catch (Exception ex)
