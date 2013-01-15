@@ -10,7 +10,7 @@ int main(int argc, char* argv[])
 	{
 		Relax::init();
 		
-		Relax r(false);
+		Relax r;
 		{
 			Element* e1 = r.elementFromXML(
 				"<block size='300 300' padding='5 5 5 5' anchor='center center'>"

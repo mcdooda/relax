@@ -87,6 +87,7 @@ void Element::draw()
 	
 	if (m_background != NULL)
 	{
+		glEnable(GL_TEXTURE_2D);
 		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 		m_background->getImage()->bind();
 		glTexCoordPointer(2, GL_FLOAT, 0, m_background->getTextureCoords());
@@ -100,6 +101,7 @@ void Element::draw()
 	
 	if (m_background != NULL)
 	{
+		glDisable(GL_TEXTURE_2D);
 		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 	}
 }
