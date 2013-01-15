@@ -42,6 +42,7 @@ Relax::Relax(bool fullScreen) :
 	m_size.setHeight(videoInfo->current_h);
 	SDL_SetVideoMode(m_size.getWidth(), m_size.getHeight(), videoInfo->vfmt->BitsPerPixel, flags);
 	
+	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	

@@ -10,7 +10,7 @@
 #include "padding.h"
 #include "size.h"
 #include "rectangle.h"
-#include "rotation.h"
+#include "background.h"
 
 namespace relax
 {
@@ -62,15 +62,6 @@ class Element
 		inline void setY(float y) { m_relativePosition.setY(y); }
 		inline Vector2 getPosition() const { return m_relativePosition; }
 		
-		/*
-		inline void setRotation(Rotation rotation) { m_rotation = rotation; }
-		inline void setRotationCenter(Vector2 rotationCenter) { m_rotation.setCenter(rotationCenter); }
-		inline void setRotationCenterX(float centerX) { m_rotation.setCenterX(centerX); }
-		inline void setRotationCenterY(float centerY) { m_rotation.setCenterY(centerY); }
-		inline void setRotationAngle(float angle) { m_rotation.setAngle(angle); }
-		inline Rotation getRotation() const { return m_rotation; }
-		*/
-		
 		inline void setColor(Color color) { m_color = color; }
 		inline void setRed(unsigned char r) { m_color.setRed(r); }
 		inline void setGreen(unsigned char g) { m_color.setGreen(g); }
@@ -85,6 +76,11 @@ class Element
 		inline void setPaddingBottom(float paddingBottom) { m_padding.setBottom(paddingBottom); }
 		inline Padding getPadding() const { return m_padding; }
 		
+		inline void setBackground(Background* background) { delete m_background; m_background = background; }
+		inline void setBackgroundImage(Texture* backgroundImage) { m_background->setImage(backgroundImage); }
+		inline void setBackgroundRepeat(Background::Repeat backgroundRepeat) { m_background->setRepeat(backgroundRepeat); }
+		inline Background* getBackground() const { return m_background; }
+		
 		void setAttribute(std::string attrName, std::string attrValue);
 		
 		virtual void render();
@@ -97,10 +93,10 @@ class Element
 		int m_anchor;
 		Vector2 m_relativePosition;
 		Rectangle m_rectangle;
-		//Rotation m_rotation;
 		Color m_color;
 		Size m_size;
 		Padding m_padding;
+		Background* m_background;
 		
 		float m_vertices[8];
 		
@@ -124,14 +120,6 @@ class Element
 		void setAttrPositionX(std::string attrValue);
 		void setAttrPositionY(std::string attrValue);
 		
-		/*
-		void setAttrRotation(std::string attrValue);
-		void setAttrRotationCenter(std::string attrValue);
-		void setAttrRotationCenterX(std::string attrValue);
-		void setAttrRotationCenterY(std::string attrValue);
-		void setAttrRotationAngle(std::string attrValue);
-		*/
-		
 		void setAttrColor(std::string attrValue);
 		void setAttrColorRed(std::string attrValue);
 		void setAttrColorGreen(std::string attrValue);
@@ -143,6 +131,10 @@ class Element
 		void setAttrPaddingRight(std::string attrValue);
 		void setAttrPaddingTop(std::string attrValue);
 		void setAttrPaddingBottom(std::string attrValue);
+		
+		void setAttrBackground(std::string attrValue);
+		void setAttrBackgroundImage(std::string attrValue);
+		void setAttrBackgroundRepeat(std::string attrValue);
 };
 	
 }

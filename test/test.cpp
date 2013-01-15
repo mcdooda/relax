@@ -10,14 +10,11 @@ int main(int argc, char* argv[])
 	{
 		Relax::init();
 		
-		Relax r;
+		Relax r(false);
 		{
 			Element* e1 = r.elementFromXML(
 				"<block size='300 300' padding='5 5 5 5' anchor='center center'>"
-					"<block size-x='200' anchor-x='center' color='0 255 0 255' />"
-					"<block size-y='200' anchor-y='center' color='0 0 255 128' padding='10 10 10 10'>"
-						"<block color-alpha='128'>Texte</block>"
-					"</block>"
+					"<block background='test/background.png scale' />"
 				"</block>"
 			);
 			r.addChild(e1);

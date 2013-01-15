@@ -10,9 +10,11 @@ namespace relax
 std::map<std::string, Element::AttrSetter> attrSetters;
 
 Element::Element(std::string tag) :
+	m_window(this),
 	m_tag(tag),
 	m_parent(NULL),
-	m_anchor(TOP | LEFT)
+	m_anchor(TOP | LEFT),
+	m_background(NULL)
 {
 	
 }
@@ -30,8 +32,11 @@ Element::~Element()
 	if (m_parent != NULL)
 		m_parent->m_children.remove(this);
 		
-	Relax* relax = (Relax*) m_window;
-	relax->unsaveTag(this);
+	if (m_window != this)
+	{
+		Relax* relax = (Relax*) m_window;
+		relax->unsaveTag(this);
+	}
 }
 
 void Element::addChild(Element* child)
@@ -53,7 +58,11 @@ void Element::setAttribute(std::string attrName, std::string attrValue)
 		}
 		catch (Exception ex)
 		{
-			throw Exception("Invalid value '" + attrValue + "' for attribute '" + attrName + "'");
+			if (ex.hasMessage())
+				throw Exception(std::string("Error while handling value '" + attrValue + "' for attribute '" + attrName + "': ") + ex.getMessage());
+				
+			else
+				throw Exception("Invalid value '" + attrValue + "' for attribute '" + attrName + "'");
 		}
 	}
 	else
@@ -75,10 +84,24 @@ void Element::renderChildren()
 void Element::draw()
 {
 	glEnableClientState(GL_VERTEX_ARRAY);
+	
+	if (m_background != NULL)
+	{
+		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+		m_background->getImage()->bind();
+		glTexCoordPointer(2, GL_FLOAT, 0, m_background->getTextureCoords());
+	}
+	
 	m_color.use();
 	glVertexPointer(2, GL_FLOAT, 0, m_vertices);
 	glDrawArrays(GL_QUADS, 0, 4);
+	
 	glDisableClientState(GL_VERTEX_ARRAY);
+	
+	if (m_background != NULL)
+	{
+		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	}
 }
 
 void Element::updatePosition()
@@ -139,6 +162,9 @@ void Element::updatePosition()
 	}
 	
 	m_rectangle.copyToVertices(m_vertices);
+	
+	if (m_background != NULL)
+		m_background->update(m_rectangle);
 
 	for (std::list<Element*>::iterator it = m_children.begin(); it != m_children.end(); it++)
 		(*it)->updatePosition();
@@ -149,29 +175,30 @@ void Element::init()
 	attrSetters["anchor"] = &Element::setAttrAnchor;
 	attrSetters["anchor-x"] = &Element::setAttrAnchorX;
 	attrSetters["anchor-y"] = &Element::setAttrAnchorY;
+	
 	attrSetters["size"] = &Element::setAttrSize;
 	attrSetters["size-x"] = &Element::setAttrSizeX;
 	attrSetters["size-y"] = &Element::setAttrSizeY;
+	
 	attrSetters["position"] = &Element::setAttrPosition;
 	attrSetters["position-x"] = &Element::setAttrPositionX;
 	attrSetters["position-y"] = &Element::setAttrPositionY;
-	/*
-	attrSetters["rotation"] = &Element::setAttrRotation;
-	attrSetters["rotation-center"] = &Element::setAttrRotationCenter;
-	attrSetters["rotation-center-x"] = &Element::setAttrRotationCenterX;
-	attrSetters["rotation-center-y"] = &Element::setAttrRotationCenterY;
-	attrSetters["rotation-angle"] = &Element::setAttrRotationAngle;
-	*/
+	
 	attrSetters["color"] = &Element::setAttrColor;
 	attrSetters["color-red"] = &Element::setAttrColorRed;
 	attrSetters["color-green"] = &Element::setAttrColorGreen;
 	attrSetters["color-blue"] = &Element::setAttrColorBlue;
 	attrSetters["color-alpha"] = &Element::setAttrColorAlpha;
+	
 	attrSetters["padding"] = &Element::setAttrPadding;
 	attrSetters["padding-left"] = &Element::setAttrPaddingLeft;
 	attrSetters["padding-right"] = &Element::setAttrPaddingRight;
 	attrSetters["padding-top"] = &Element::setAttrPaddingTop;
 	attrSetters["padding-bottom"] = &Element::setAttrPaddingBottom;
+	
+	attrSetters["background"] = &Element::setAttrBackground;
+	attrSetters["background-image"] = &Element::setAttrBackgroundImage;
+	attrSetters["background-repeat"] = &Element::setAttrBackgroundRepeat;
 }
 
 void Element::setAttrAnchor(std::string attrValue)
@@ -298,66 +325,6 @@ void Element::setAttrPositionY(std::string attrValue)
 	setY(y);
 }
 
-/*
-void Element::setAttrRotation(std::string attrValue)
-{
-	float centerX, centerY, angle;
-	std::istringstream ss(attrValue);
-	ss >> centerX;
-	ss >> centerY;
-	ss >> angle;
-	if (ss.fail())
-		throw Exception();
-		
-	setRotation(Rotation(Vector2(centerX, centerY), angle));
-}
-
-void Element::setAttrRotationCenter(std::string attrValue)
-{
-	float centerX, centerY;
-	std::istringstream ss(attrValue);
-	ss >> centerX;
-	ss >> centerY;
-	if (ss.fail())
-		throw Exception();
-		
-	setRotationCenter(Vector2(centerX, centerY));
-}
-
-void Element::setAttrRotationCenterX(std::string attrValue)
-{
-	float centerX;
-	std::istringstream ss(attrValue);
-	ss >> centerX;
-	if (ss.fail())
-		throw Exception();
-		
-	setRotationCenterX(centerX);
-}
-
-void Element::setAttrRotationCenterY(std::string attrValue)
-{
-	float centerY;
-	std::istringstream ss(attrValue);
-	ss >> centerY;
-	if (ss.fail())
-		throw Exception();
-		
-	setRotationCenterY(centerY);
-}
-
-void Element::setAttrRotationAngle(std::string attrValue)
-{
-	float angle;
-	std::istringstream ss(attrValue);
-	ss >> angle;
-	if (ss.fail())
-		throw Exception();
-		
-	setRotationAngle(angle);
-}
-*/
-
 void Element::setAttrColor(std::string attrValue)
 {
 	unsigned int r, g, b, a;
@@ -472,6 +439,46 @@ void Element::setAttrPaddingBottom(std::string attrValue)
 		throw Exception();
 		
 	setPaddingBottom(paddingBottom);
+}
+
+void Element::setAttrBackground(std::string attrValue)
+{
+	std::string backgroundImage, backgroundRepeat;
+	std::istringstream ss(attrValue);
+	ss >> backgroundImage;
+	ss >> backgroundRepeat;
+	if (ss.fail())
+		throw Exception();
+		
+	setAttrBackgroundImage(backgroundImage);
+	setAttrBackgroundRepeat(backgroundRepeat);
+}
+
+void Element::setAttrBackgroundImage(std::string attrValue)
+{
+	if (m_background == NULL)
+		setBackground(new Background());
+		
+	setBackgroundImage(Texture::get(attrValue));
+}
+
+void Element::setAttrBackgroundRepeat(std::string attrValue)
+{
+	if (m_background == NULL)
+		setBackground(new Background());
+		
+	Background::Repeat backgroundRepeat;
+	
+	if (attrValue == "scale")
+		backgroundRepeat = Background::REPEAT;
+		
+	else if (attrValue == "repeat")
+		backgroundRepeat = Background::SCALE;
+		
+	else
+		throw Exception();
+		
+	setBackgroundRepeat(backgroundRepeat);
 }
 
 }

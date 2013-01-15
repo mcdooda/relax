@@ -16,6 +16,10 @@ class Texture
 		
 	public:
 		inline Vector2 getSize() const { return m_size; }
+		inline float getWidth() const { return m_size.getX(); }
+		inline float getHeight() const { return m_size.getY(); }
+		
+		inline void bind() const { glBindTexture(GL_TEXTURE_2D, m_id); }
 		
 		static Texture* get(std::string fileName);
 		
