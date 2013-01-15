@@ -11,14 +11,11 @@ int main(int argc, char* argv[])
 		Relax::init();
 		
 		Relax r;
-		{
-			Element* e1 = r.elementFromXML(
-				"<block size='300 300' padding='5 5 5 5' anchor='center center'>"
-					"<block background='test/background.png scale' />"
-				"</block>"
-			);
-			r.addChild(e1);
-		}
+		r.addXML(
+			"<block size='600 600' padding='5 5 5 5' anchor='center center' color='255 0 0 255'>"
+				"<block background='test/background.png repeat' />"
+			"</block>"
+		);
 		
 		r.update();
 		

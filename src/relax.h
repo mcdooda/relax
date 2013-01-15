@@ -6,6 +6,7 @@
 #include <lua5.2/lua.hpp>
 #include "element.h"
 #include "exception.h"
+#include "xml.h"
 
 #define K(k) SDLK_##k
 
@@ -37,8 +38,6 @@ class Relax : public Element
 		inline void update() { updatePosition(); }
 		
 		void runScript(const char* fileName);
-		
-		Element* elementFromXML(const char* xml);
 		
 		void saveTag(Element* element);
 		void unsaveTag(Element* element);

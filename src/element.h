@@ -30,11 +30,8 @@ class Element
 		
 		typedef void (Element::*AttrSetter)(std::string attrValue);
 	
-	protected:
-		Element(std::string tag);
-		
 	public:
-		Element(std::string tag, Element* window);
+		Element(std::string tag);
 		virtual ~Element();
 		
 		inline const std::string& getTag() const { return m_tag; }
@@ -83,6 +80,8 @@ class Element
 		
 		void setAttribute(std::string attrName, std::string attrValue);
 		
+		void addXML(const char* xml);
+		
 		virtual void render();
 		
 	protected:
@@ -101,6 +100,7 @@ class Element
 		float m_vertices[8];
 		
 	protected:
+		void saveChildTag(Element* child);
 		void renderChildren();
 		void draw();
 		void updatePosition();

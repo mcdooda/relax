@@ -3,6 +3,7 @@
 #include "relax.h"
 #include "element.h"
 #include "exception.h"
+#include "xml.h"
 
 namespace relax
 {
@@ -10,7 +11,7 @@ namespace relax
 std::map<std::string, Element::AttrSetter> attrSetters;
 
 Element::Element(std::string tag) :
-	m_window(this),
+	m_window(NULL),
 	m_tag(tag),
 	m_parent(NULL),
 	m_anchor(TOP | LEFT),
@@ -19,20 +20,12 @@ Element::Element(std::string tag) :
 	
 }
 
-Element::Element(std::string tag, Element* window) :
-	Element(tag)
-{
-	m_window = window;
-	Relax* relax = (Relax*) window;
-	relax->saveTag(this);
-}
-
 Element::~Element()
 {
 	if (m_parent != NULL)
 		m_parent->m_children.remove(this);
 		
-	if (m_window != this)
+	if (m_window != this && m_window != NULL)
 	{
 		Relax* relax = (Relax*) m_window;
 		relax->unsaveTag(this);
@@ -43,6 +36,7 @@ void Element::addChild(Element* child)
 {
 	child->m_parent = this;
 	m_children.push_back(child);
+	saveChildTag(child);
 }
 
 void Element::setAttribute(std::string attrName, std::string attrValue)
@@ -73,6 +67,18 @@ void Element::render()
 {
 	draw();
 	renderChildren();
+}
+
+void Element::saveChildTag(Element* child)
+{
+	if (m_window != NULL)
+	{
+		Relax* relax = (Relax*) m_window;
+		child->m_window = m_window;
+		relax->saveTag(child);
+		for (std::list<Element*>::iterator it = child->m_children.begin(); it != child->m_children.end(); it++)
+			child->saveChildTag(*it);
+	}
 }
 
 void Element::renderChildren()
@@ -472,15 +478,20 @@ void Element::setAttrBackgroundRepeat(std::string attrValue)
 	Background::Repeat backgroundRepeat;
 	
 	if (attrValue == "scale")
-		backgroundRepeat = Background::REPEAT;
+		backgroundRepeat = Background::SCALE;
 		
 	else if (attrValue == "repeat")
-		backgroundRepeat = Background::SCALE;
+		backgroundRepeat = Background::REPEAT;
 		
 	else
 		throw Exception();
 		
 	setBackgroundRepeat(backgroundRepeat);
+}
+
+void Element::addXML(const char* xml)
+{
+	xml::addXML(this, xml);
 }
 
 }
