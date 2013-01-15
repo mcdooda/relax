@@ -10,12 +10,8 @@ int main(int argc, char* argv[])
 	{
 		Relax::init();
 		
-		Relax r;
-		r.addXML(
-			"<block size='600 600' padding='5 5 5 5' anchor='center center' color='255 0 0 255'>"
-				"<block background='test/background.png repeat' />"
-			"</block>"
-		);
+		Relax r(false, true);
+		r.addXMLFile("test/ui.xml");
 		
 		r.update();
 		

@@ -13,6 +13,9 @@ namespace xml
 Element* elementFromXML(const char* xml);
 void addXML(Element* element, const char* xml);
 
+Element* elementFromXMLFile(const char* fileName);
+void addXMLFile(Element* element, const char* fileName);
+
 }
 
 }

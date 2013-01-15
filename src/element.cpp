@@ -63,6 +63,16 @@ void Element::setAttribute(std::string attrName, std::string attrValue)
 		throw Exception("Unknown attribute '" + attrName + "'");
 }
 
+void Element::addXML(const char* xml)
+{
+	xml::addXML(this, xml);
+}
+
+void Element::addXMLFile(const char* fileName)
+{
+	xml::addXMLFile(this, fileName);
+}
+
 void Element::render()
 {
 	draw();
@@ -487,11 +497,6 @@ void Element::setAttrBackgroundRepeat(std::string attrValue)
 		throw Exception();
 		
 	setBackgroundRepeat(backgroundRepeat);
-}
-
-void Element::addXML(const char* xml)
-{
-	xml::addXML(this, xml);
 }
 
 }

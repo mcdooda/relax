@@ -20,10 +20,8 @@ class Relax : public Element
 		static void init();
 		static void quit();
 		
-		Relax(bool fullScreen = true);
+		Relax(bool fullScreen = true, bool resizable = false);
 		~Relax();
-		
-		inline bool isFullScreen() const { return m_fullScreen; }
 		
 		void pumpEvents();
 		bool isPressed(Key key);
@@ -45,10 +43,13 @@ class Relax : public Element
 		std::set<Element*> getElementsByTag(std::string tag);
 		
 	private:
+		Uint32 m_videoFlags;
 		bool m_open;
-		bool m_fullScreen;
 		std::map<std::string, std::set<Element*> > m_elementsByTag;
 		lua_State* m_L;
+		
+	private:
+		void updateSize(int width, int height);
 };
 
 }

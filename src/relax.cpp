@@ -26,26 +26,22 @@ void Relax::quit()
 	SDL_Quit();
 }
 
-Relax::Relax(bool fullScreen) :
+Relax::Relax(bool fullScreen, bool resizable) :
 	Element("relax"),
-	m_open(true),
-	m_fullScreen(fullScreen)
+	m_videoFlags(SDL_OPENGL),
+	m_open(true)
 {
-	const SDL_VideoInfo* videoInfo = SDL_GetVideoInfo();
-	Uint32 flags = SDL_OPENGL;
-	
 	if (fullScreen)
-		flags |= SDL_FULLSCREEN;
+		m_videoFlags |= SDL_FULLSCREEN;
+		
+	if (resizable)
+		m_videoFlags |= SDL_RESIZABLE;
 	
-	m_size.setWidth(videoInfo->current_w);
-	m_size.setHeight(videoInfo->current_h);
-	SDL_SetVideoMode(m_size.getWidth(), m_size.getHeight(), videoInfo->vfmt->BitsPerPixel, flags);
+	const SDL_VideoInfo* videoInfo = SDL_GetVideoInfo();
+	updateSize(videoInfo->current_w, videoInfo->current_h);
 	
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	
-	glViewport(0, 0, m_size.getWidth(), m_size.getHeight());
-	gluOrtho2D(0, m_size.getWidth(), m_size.getHeight(), 0);
 	
 	m_L = luaL_newstate();
 }
@@ -78,6 +74,15 @@ void Relax::pumpEvents()
 			
 			case SDL_KEYUP:
 			justReleasedKeys[event.key.keysym.sym] = 1;
+			break;
+			
+			case SDL_VIDEORESIZE:
+			updateSize(event.resize.w, event.resize.h);
+			update();
+			break;
+			
+			case SDL_QUIT:
+			m_open = false;
 			break;
 		}
 	}
@@ -141,6 +146,22 @@ std::set<Element*> Relax::getElementsByTag(std::string tag)
 		
 	else
 		return std::set<Element*>();
+}
+
+void Relax::updateSize(int width, int height)
+{
+	m_size.setWidth(width);
+	m_size.setHeight(height);
+	
+	m_rectangle.setLeft(0);
+	m_rectangle.setRight(width);
+	m_rectangle.setTop(0);
+	m_rectangle.setBottom(height);
+	
+	SDL_SetVideoMode(width, height, 32, m_videoFlags);
+	glViewport(0, 0, width, height);
+	glLoadIdentity();
+	gluOrtho2D(0, width, height, 0);
 }
 
 }

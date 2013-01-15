@@ -1,0 +1,10 @@
+<block size="600 600" padding="5 5 5 5" anchor="left top" color="255 0 0 255">
+	<block background="test/background.png repeat" />
+</block>
+<block size="600 600" padding="5 5 5 5" anchor="center center" color="255 0 0 255">
+	<block background="test/background.png repeat" />
+</block>
+<block size="600 600" padding="5 5 5 5" anchor="right bottom" color="255 0 0 255">
+	<block background="test/background.png repeat" />
+</block>
+

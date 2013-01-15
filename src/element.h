@@ -81,6 +81,7 @@ class Element
 		void setAttribute(std::string attrName, std::string attrValue);
 		
 		void addXML(const char* xml);
+		void addXMLFile(const char* fileName);
 		
 		virtual void render();
 		
