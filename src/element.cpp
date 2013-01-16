@@ -219,6 +219,11 @@ void Element::init()
 	attrSetters["background-repeat"] = &Element::setAttrBackgroundRepeat;
 }
 
+void Element::quit()
+{
+	
+}
+
 void Element::setAttrAnchor(std::string attrValue)
 {
 	std::string anchorX, anchorY;

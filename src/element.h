@@ -107,6 +107,7 @@ class Element
 		void updatePosition();
 		
 		static void init();
+		static void quit();
 		
 		// attribute modifiers
 		void setAttrAnchor(std::string attrValue);

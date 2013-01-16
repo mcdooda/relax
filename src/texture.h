@@ -2,6 +2,7 @@
 #define RELAX_TEXTURE_H
 
 #include <iostream>
+#include <SDL/SDL.h>
 #include <GL/gl.h>
 #include "vector2.h"
 
@@ -10,7 +11,8 @@ namespace relax
 
 class Texture
 {
-	private:
+	protected:
+		Texture();
 		Texture(std::string fileName);
 		~Texture();
 		
@@ -24,11 +26,14 @@ class Texture
 		static Texture* get(std::string fileName);
 		
 		static void init();
-		static void free();
+		static void quit();
 		
 	private:
 		GLuint m_id;
 		Vector2 m_size;
+		
+	protected:
+		void loadSurface(SDL_Surface* surface);
 };
 
 }

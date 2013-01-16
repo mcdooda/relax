@@ -22,6 +22,7 @@ target_link_libraries(
 	GLU
 	SDL
 	SDL_image
+	SDL_ttf
 	expat
 	lua5.2
 )

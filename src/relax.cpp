@@ -4,6 +4,7 @@
 #include <lua5.2/lua.hpp>
 #include "relax.h"
 #include "xml.h"
+#include "font.h"
 
 namespace relax
 {
@@ -18,11 +19,18 @@ void Relax::init()
 		
 	memset(justPressedKeys, 0, sizeof(justPressedKeys));
 	memset(justReleasedKeys, 0, sizeof(justReleasedKeys));
+	
 	Element::init();
+	Texture::init();
+	Font::init();
 }
 
 void Relax::quit()
 {
+	Element::quit();
+	Texture::quit();
+	Font::quit();
+	
 	SDL_Quit();
 }
 
