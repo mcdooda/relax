@@ -20,7 +20,9 @@ class Relax : public Element
 		static void init();
 		static void quit();
 		
-		Relax(bool fullScreen = true, bool resizable = false);
+		static Vector2 getDesktopResolution();
+		
+		Relax(Vector2 size = getDesktopResolution(), bool fullScreen = true, bool resizable = false);
 		~Relax();
 		
 		void pumpEvents();
@@ -49,7 +51,7 @@ class Relax : public Element
 		lua_State* m_L;
 		
 	private:
-		void updateSize(int width, int height);
+		void updateSize(Vector2 newSize);
 };
 
 }

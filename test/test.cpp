@@ -10,7 +10,7 @@ int main(int argc, char* argv[])
 	{
 		Relax::init();
 		
-		Relax r(false, true);
+		Relax r(Vector2(1000, 1000), false, true);
 		r.addXMLFile("test/ui.xml");
 		
 		r.update();

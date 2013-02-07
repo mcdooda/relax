@@ -34,7 +34,13 @@ void Relax::quit()
 	SDL_Quit();
 }
 
-Relax::Relax(bool fullScreen, bool resizable) :
+Vector2 Relax::getDesktopResolution()
+{
+	const SDL_VideoInfo* videoInfo = SDL_GetVideoInfo();
+	return Vector2(videoInfo->current_w, videoInfo->current_h);
+}
+
+Relax::Relax(Vector2 size, bool fullScreen, bool resizable) :
 	Element("relax"),
 	m_videoFlags(SDL_OPENGL),
 	m_open(true)
@@ -45,8 +51,7 @@ Relax::Relax(bool fullScreen, bool resizable) :
 	if (resizable)
 		m_videoFlags |= SDL_RESIZABLE;
 	
-	const SDL_VideoInfo* videoInfo = SDL_GetVideoInfo();
-	updateSize(videoInfo->current_w, videoInfo->current_h);
+	updateSize(size);
 	
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -85,7 +90,7 @@ void Relax::pumpEvents()
 			break;
 			
 			case SDL_VIDEORESIZE:
-			updateSize(event.resize.w, event.resize.h);
+			updateSize(Vector2(event.resize.w, event.resize.h));
 			update();
 			break;
 			
@@ -156,20 +161,20 @@ std::set<Element*> Relax::getElementsByTag(std::string tag)
 		return std::set<Element*>();
 }
 
-void Relax::updateSize(int width, int height)
+void Relax::updateSize(Vector2 newSize)
 {
-	m_size.setWidth(width);
-	m_size.setHeight(height);
+	m_size.setWidth(newSize.getX());
+	m_size.setHeight(newSize.getY());
 	
 	m_rectangle.setLeft(0);
-	m_rectangle.setRight(width);
+	m_rectangle.setRight(newSize.getX());
 	m_rectangle.setTop(0);
-	m_rectangle.setBottom(height);
+	m_rectangle.setBottom(newSize.getY());
 	
-	SDL_SetVideoMode(width, height, 32, m_videoFlags);
-	glViewport(0, 0, width, height);
+	SDL_SetVideoMode(newSize.getX(), newSize.getY(), 32, m_videoFlags);
+	glViewport(0, 0, newSize.getX(), newSize.getY());
 	glLoadIdentity();
-	gluOrtho2D(0, width, height, 0);
+	gluOrtho2D(0, newSize.getX(), newSize.getY(), 0);
 }
 
 }
