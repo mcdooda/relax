@@ -5,6 +5,7 @@
 #include <list>
 #include <string>
 #include <map>
+#include <lua5.2/lua.hpp>
 #include "vector2.h"
 #include "color.h"
 #include "padding.h"
@@ -20,10 +21,10 @@ class Element
 	public:
 		enum Anchor
 		{
-			LEFT    = 0x01,
+			LEFT	= 0x01,
 			RIGHT   = 0x02,
 			CENTERX = 0x04,
-			TOP     = 0x08,
+			TOP	 = 0x08,
 			BOTTOM  = 0x10,
 			CENTERY = 0x20
 		};
@@ -85,11 +86,17 @@ class Element
 		
 		virtual void render();
 		
+		void checkMouseOver();
+		bool isMouseOver();
+		void handleClick();
+		
 	protected:
-		Element* m_window;
+		// elements tree
 		std::string m_tag;
 		Element* m_parent;
 		std::list<Element*> m_children;
+		
+		// graphics
 		int m_anchor;
 		Vector2 m_relativePosition;
 		Rectangle m_rectangle;
@@ -97,8 +104,10 @@ class Element
 		Size m_size;
 		Padding m_padding;
 		Background* m_background;
-		
 		float m_vertices[8];
+		
+		// lua callbacks
+		int m_onclick;
 		
 	protected:
 		void saveChildTag(Element* child);
@@ -137,6 +146,8 @@ class Element
 		void setAttrBackground(std::string attrValue);
 		void setAttrBackgroundImage(std::string attrValue);
 		void setAttrBackgroundRepeat(std::string attrValue);
+		
+		void setAttrOnClick(std::string attrValue);
 };
 	
 }

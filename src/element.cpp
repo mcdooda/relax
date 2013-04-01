@@ -11,11 +11,11 @@ namespace relax
 std::map<std::string, Element::AttrSetter> attrSetters;
 
 Element::Element(std::string tag) :
-	m_window(NULL),
 	m_tag(tag),
 	m_parent(NULL),
 	m_anchor(TOP | LEFT),
-	m_background(NULL)
+	m_background(NULL),
+	m_onclick(LUA_NOREF)
 {
 	
 }
@@ -24,12 +24,11 @@ Element::~Element()
 {
 	if (m_parent != NULL)
 		m_parent->m_children.remove(this);
-		
-	if (m_window != this && m_window != NULL)
-	{
-		Relax* relax = (Relax*) m_window;
-		relax->unsaveTag(this);
-	}
+	
+	lua_State* L = Relax::getLuaState();
+	luaL_unref(L, LUA_REGISTRYINDEX, m_onclick);
+	
+	Relax::unsaveTag(this);
 }
 
 void Element::addChild(Element* child)
@@ -79,16 +78,57 @@ void Element::render()
 	renderChildren();
 }
 
+void Element::checkMouseOver()
+{
+	if (isMouseOver())
+	{
+		Relax::setOverElement(this);
+		for (std::list<Element*>::iterator it = m_children.begin(); it != m_children.end(); it++)
+			(*it)->checkMouseOver();
+	}
+}
+
+bool Element::isMouseOver()
+{
+	return m_rectangle.contains(Relax::getMouse());
+}
+
+void Element::handleClick()
+{
+	if (m_onclick != LUA_NOREF)
+	{
+		lua_State* L = Relax::getLuaState();
+		lua_pushinteger(L, m_onclick);
+		lua_rawget(L, LUA_REGISTRYINDEX);
+		lua_pushlightuserdata(L, this);
+		int code = lua_pcall(L, 1, 0, 0);
+		if (code != LUA_OK)
+		{
+			switch (code)
+			{
+				case LUA_ERRRUN:
+				std::cerr << "runtime error:" << std::endl;
+				break;
+				
+				case LUA_ERRMEM:
+				std::cerr << "memory allocation error:" << std::endl;
+				break;
+				
+				case LUA_ERRGCMM:
+				std::cerr << "error while running a __gc metamethod:" << std::endl;
+				break;
+			}
+			std::cerr << lua_tostring(L, -1) << std::endl;
+			lua_pop(L, 1);
+		}
+	}
+}
+
 void Element::saveChildTag(Element* child)
 {
-	if (m_window != NULL)
-	{
-		Relax* relax = (Relax*) m_window;
-		child->m_window = m_window;
-		relax->saveTag(child);
-		for (std::list<Element*>::iterator it = child->m_children.begin(); it != child->m_children.end(); it++)
-			child->saveChildTag(*it);
-	}
+	Relax::saveTag(child);
+	for (std::list<Element*>::iterator it = child->m_children.begin(); it != child->m_children.end(); it++)
+		child->saveChildTag(*it);
 }
 
 void Element::renderChildren()
@@ -217,6 +257,8 @@ void Element::init()
 	attrSetters["background"] = &Element::setAttrBackground;
 	attrSetters["background-image"] = &Element::setAttrBackgroundImage;
 	attrSetters["background-repeat"] = &Element::setAttrBackgroundRepeat;
+	
+	attrSetters["onclick"] = &Element::setAttrOnClick;
 }
 
 void Element::quit()
@@ -502,6 +544,15 @@ void Element::setAttrBackgroundRepeat(std::string attrValue)
 		throw Exception();
 		
 	setBackgroundRepeat(backgroundRepeat);
+}
+
+void Element::setAttrOnClick(std::string attrValue)
+{
+	lua_State* L = Relax::getLuaState();
+	luaL_unref(L, LUA_REGISTRYINDEX, m_onclick);
+	std::string code = "local self = ...; " + attrValue;
+	luaL_loadstring(L, code.c_str());
+	m_onclick = luaL_ref(L, LUA_REGISTRYINDEX);
 }
 
 }

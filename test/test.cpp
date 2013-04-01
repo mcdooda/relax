@@ -8,7 +8,10 @@ int main(int argc, char* argv[])
 {
 	try
 	{
-		Relax::init();
+		lua_State* L = luaL_newstate();
+		luaL_openlibs(L);
+		
+		Relax::init(L);
 		
 		Relax r(Vector2(1000, 1000), false, true);
 		r.addXMLFile("test/ui.xml");
@@ -26,6 +29,7 @@ int main(int argc, char* argv[])
 		}
 		
 		Relax::quit();
+		lua_close(L);
 	}
 	catch (Exception ex)
 	{

@@ -9,11 +9,19 @@
 namespace relax
 {
 
-static Uint8 justPressedKeys[SDLK_LAST];
-static Uint8 justReleasedKeys[SDLK_LAST];
+lua_State* Relax::L;
+std::map<std::string, std::set<Element*> > Relax::elementsByTag;
+bool Relax::justPressedKeys[SDLK_LAST];
+bool Relax::justReleasedKeys[SDLK_LAST];
+bool Relax::justPressedButtons[RELAX_NUM_BUTTONS];
+bool Relax::justReleasedButtons[RELAX_NUM_BUTTONS];
+Vector2 Relax::mouse;
+Element* Relax::over;
 
-void Relax::init()
+void Relax::init(lua_State* L1)
 {
+	L = L1;
+	
 	if (SDL_Init(SDL_INIT_VIDEO) < 0)
 		throw Exception(SDL_GetError());
 		
@@ -23,10 +31,14 @@ void Relax::init()
 	Element::init();
 	Texture::init();
 	Font::init();
+	
+	over = NULL;
 }
 
 void Relax::quit()
 {
+	elementsByTag.clear();
+	
 	Element::quit();
 	Texture::quit();
 	Font::quit();
@@ -34,10 +46,69 @@ void Relax::quit()
 	SDL_Quit();
 }
 
+lua_State* Relax::getLuaState()
+{
+	return L;
+}
+
+void Relax::setLuaState(lua_State* L1)
+{
+	L = L1;
+}
+
 Vector2 Relax::getDesktopResolution()
 {
 	const SDL_VideoInfo* videoInfo = SDL_GetVideoInfo();
 	return Vector2(videoInfo->current_w, videoInfo->current_h);
+}
+
+void Relax::saveTag(Element* element)
+{
+	std::string tag = element->getTag();
+	std::map<std::string, std::set<Element*> >::iterator it = elementsByTag.find(tag);
+	
+	if (it != elementsByTag.end())
+	{
+		it->second.insert(element);
+	}
+	else
+	{
+		elementsByTag[tag] = std::set<Element*>();
+		elementsByTag[tag].insert(element);
+	}
+}
+
+void Relax::unsaveTag(Element* element)
+{
+	std::string tag = element->getTag();
+	std::map<std::string, std::set<Element*> >::iterator it = elementsByTag.find(tag);
+	
+	if (it->second.size() == 1)
+		elementsByTag.erase(it);
+		
+	else
+		it->second.erase(element);
+}
+
+std::set<Element*> Relax::getElementsByTag(std::string tag)
+{
+	std::map<std::string, std::set<Element*> >::iterator it = elementsByTag.find(tag);
+	
+	if (it != elementsByTag.end())
+		return it->second;
+		
+	else
+		return std::set<Element*>();
+}
+
+void Relax::setOverElement(Element* element)
+{
+	over = element;
+}
+
+Vector2 Relax::getMouse()
+{
+	return mouse;
 }
 
 Relax::Relax(Vector2 size, bool fullScreen, bool resizable) :
@@ -55,8 +126,6 @@ Relax::Relax(Vector2 size, bool fullScreen, bool resizable) :
 	
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	
-	m_L = luaL_newstate();
 }
 
 Relax::~Relax()
@@ -76,22 +145,39 @@ void Relax::pumpEvents()
 {
 	memset(justPressedKeys, 0, sizeof(justPressedKeys));
 	memset(justReleasedKeys, 0, sizeof(justReleasedKeys));
+	memset(justPressedButtons, 0, sizeof(justPressedButtons));
+	memset(justReleasedButtons, 0, sizeof(justReleasedButtons));
 	SDL_Event event;
 	while (SDL_PollEvent(&event))
 	{
 		switch (event.type)
 		{
 			case SDL_KEYDOWN:
-			justPressedKeys[event.key.keysym.sym] = 1;
+			justPressedKeys[event.key.keysym.sym] = true;
 			break;
 			
 			case SDL_KEYUP:
-			justReleasedKeys[event.key.keysym.sym] = 1;
+			justReleasedKeys[event.key.keysym.sym] = true;
 			break;
 			
 			case SDL_VIDEORESIZE:
 			updateSize(Vector2(event.resize.w, event.resize.h));
 			update();
+			break;
+			
+			case SDL_MOUSEMOTION:
+			mouse.setX(event.motion.x);
+			mouse.setY(event.motion.y);
+			checkMouseOver();
+			break;
+			
+			case SDL_MOUSEBUTTONDOWN:
+			justPressedButtons[event.button.button] = true;
+			checkClick();
+			break;
+			
+			case SDL_MOUSEBUTTONUP:
+			justReleasedButtons[event.button.button] = true;
 			break;
 			
 			case SDL_QUIT:
@@ -117,48 +203,14 @@ bool Relax::isJustReleased(Key key)
 	return justReleasedKeys[key];
 }
 
+Vector2 Relax::getMousePosition()
+{
+	return mouse;
+}
+
 void Relax::runScript(const char* fileName)
 {
-	luaL_dofile(m_L, fileName);
-}
-
-void Relax::saveTag(Element* element)
-{
-	std::string tag = element->getTag();
-	std::map<std::string, std::set<Element*> >::iterator it = m_elementsByTag.find(tag);
-	
-	if (it != m_elementsByTag.end())
-	{
-		it->second.insert(element);
-	}
-	else
-	{
-		m_elementsByTag[tag] = std::set<Element*>();
-		m_elementsByTag[tag].insert(element);
-	}
-}
-
-void Relax::unsaveTag(Element* element)
-{
-	std::string tag = element->getTag();
-	std::map<std::string, std::set<Element*> >::iterator it = m_elementsByTag.find(tag);
-	
-	if (it->second.size() == 1)
-		m_elementsByTag.erase(it);
-		
-	else
-		it->second.erase(element);
-}
-
-std::set<Element*> Relax::getElementsByTag(std::string tag)
-{
-	std::map<std::string, std::set<Element*> >::iterator it = m_elementsByTag.find(tag);
-	
-	if (it != m_elementsByTag.end())
-		return it->second;
-		
-	else
-		return std::set<Element*>();
+	luaL_dofile(L, fileName);
 }
 
 void Relax::updateSize(Vector2 newSize)
@@ -175,6 +227,18 @@ void Relax::updateSize(Vector2 newSize)
 	glViewport(0, 0, newSize.getX(), newSize.getY());
 	glLoadIdentity();
 	gluOrtho2D(0, newSize.getX(), newSize.getY(), 0);
+}
+
+void Relax::checkMouseOver()
+{
+	over = this;
+	Element::checkMouseOver();
+}
+
+void Relax::checkClick()
+{
+	if (over != NULL)
+		over->handleClick();
 }
 
 }
