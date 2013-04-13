@@ -119,7 +119,8 @@ static void parseFile(const char* fileName, void* userData, bool addFakeRoot = f
 		while (parsed && !feof(f))
 		{
 			fgets(line, sizeof(line), f);
-			parsed = XML_Parse(parser, line, strlen(line), 0);
+			if (!feof(f))
+				parsed = XML_Parse(parser, line, strlen(line), 0);
 		}
 		
 		if (!addFakeRoot)

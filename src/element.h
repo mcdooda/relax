@@ -24,7 +24,7 @@ class Element
 			LEFT	= 0x01,
 			RIGHT   = 0x02,
 			CENTERX = 0x04,
-			TOP	 = 0x08,
+			TOP	 	= 0x08,
 			BOTTOM  = 0x10,
 			CENTERY = 0x20
 		};
@@ -87,8 +87,11 @@ class Element
 		virtual void render();
 		
 		void checkMouseOver();
-		bool isMouseOver();
+		virtual bool isMouseOver();
+		
 		void handleClick();
+		void handleMouseOver();
+		void handleMouseOut();
 		
 	protected:
 		// elements tree
@@ -107,7 +110,9 @@ class Element
 		float m_vertices[8];
 		
 		// lua callbacks
-		int m_onclick;
+		int m_onClick;
+		int m_onMouseOver;
+		int m_onMouseOut;
 		
 	protected:
 		void saveChildTag(Element* child);
@@ -117,6 +122,8 @@ class Element
 		
 		static void init();
 		static void quit();
+		
+		void handleEvent(int handler);
 		
 		// attribute modifiers
 		void setAttrAnchor(std::string attrValue);
@@ -147,7 +154,10 @@ class Element
 		void setAttrBackgroundImage(std::string attrValue);
 		void setAttrBackgroundRepeat(std::string attrValue);
 		
+		void setAttrOnEvent(std::string attrValue, int* handler);
 		void setAttrOnClick(std::string attrValue);
+		void setAttrOnMouseOver(std::string attrValue);
+		void setAttrOnMouseOut(std::string attrValue);
 };
 	
 }

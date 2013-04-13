@@ -17,6 +17,7 @@ bool Relax::justPressedButtons[RELAX_NUM_BUTTONS];
 bool Relax::justReleasedButtons[RELAX_NUM_BUTTONS];
 Vector2 Relax::mouse;
 Element* Relax::over;
+Element* Relax::previousOver;
 
 void Relax::init(lua_State* L1)
 {
@@ -33,6 +34,7 @@ void Relax::init(lua_State* L1)
 	Font::init();
 	
 	over = NULL;
+	previousOver = NULL;
 }
 
 void Relax::quit()
@@ -101,11 +103,6 @@ std::set<Element*> Relax::getElementsByTag(std::string tag)
 		return std::set<Element*>();
 }
 
-void Relax::setOverElement(Element* element)
-{
-	over = element;
-}
-
 Vector2 Relax::getMouse()
 {
 	return mouse;
@@ -139,6 +136,11 @@ void Relax::render()
 	renderChildren();
 	glFlush();
 	SDL_GL_SwapBuffers();
+}
+
+bool Relax::isMouseOver()
+{
+	return true;
 }
 
 void Relax::pumpEvents()
@@ -231,8 +233,17 @@ void Relax::updateSize(Vector2 newSize)
 
 void Relax::checkMouseOver()
 {
+	previousOver = over;
 	over = this;
 	Element::checkMouseOver();
+	if (previousOver != NULL && previousOver != over)
+	{
+		previousOver->handleMouseOut();
+	}
+	if (over != NULL && over != previousOver)
+	{
+		over->handleMouseOver();
+	}
 }
 
 void Relax::checkClick()

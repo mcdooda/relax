@@ -1,10 +1,17 @@
-<block size="410 410" padding="5 5 5 5" anchor="left top" color="255 0 0 255">
-	<block background="test/background.png repeat" onclick="print(self)" />
-</block>
-<block size="410 410" padding="5 5 5 5" anchor="right bottom" color="255 0 0 255">
-	<block background="test/background.png repeat" onclick="print(self)" />
-</block>
-<block size="310 310" padding="5 5 5 5" anchor="center center" color="255 0 0 255">
-	<block background="test/background.png scale" onclick="print(self)" />
-</block>
+<block size="310 310"
+	padding="50 50 50 50"
+	anchor="center center"
+	color="255 0 0 255"
+	onclick="print('click: '..tostring(self))"
+	onmouseover="print('mouseover: '..tostring(self))"
+	onmouseout="print('mouseout: '..tostring(self))">
 
+	<block size="250 250"
+		padding="50 50 50 50"
+		anchor="center center"
+		color="0 0 255 255"
+		onclick="print('click: '..tostring(self))"
+		onmouseover="print('mouseover: '..tostring(self))"
+		onmouseout="print('mouseout: '..tostring(self))" />
+	
+</block>

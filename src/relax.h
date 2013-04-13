@@ -28,7 +28,7 @@ class Relax : public Element
 		static void saveTag(Element* element);
 		static void unsaveTag(Element* element);
 		static std::set<Element*> getElementsByTag(std::string tag);
-		static void setOverElement(Element* element);
+		inline static void setOverElement(Element* element) { over = element; }
 		static Vector2 getMouse();
 		
 		/* public */
@@ -49,6 +49,8 @@ class Relax : public Element
 		inline void close() { m_open = false; }
 		
 		virtual void render();
+		
+		virtual bool isMouseOver();
 		
 		inline void update() { updatePosition(); }
 		
@@ -75,6 +77,7 @@ class Relax : public Element
 		static bool justReleasedButtons[RELAX_NUM_BUTTONS];
 		static Vector2 mouse;
 		static Element* over;
+		static Element* previousOver;
 };
 
 }
