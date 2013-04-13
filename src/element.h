@@ -59,6 +59,7 @@ class Element
 		inline void setX(float x) { m_relativePosition.setX(x); }
 		inline void setY(float y) { m_relativePosition.setY(y); }
 		inline Vector2 getPosition() const { return m_relativePosition; }
+		inline Vector2 getAbsolutePosition() const { return Vector2(m_rectangle.getLeft(), m_rectangle.getTop()); }
 		
 		inline void setColor(Color color) { m_color = color; }
 		inline void setRed(unsigned char r) { m_color.setRed(r); }
@@ -89,9 +90,11 @@ class Element
 		void checkMouseOver();
 		virtual bool isMouseOver();
 		
-		void handleClick();
+		void handleMouseDown();
+		void handleMouseUp();
 		void handleMouseOver();
 		void handleMouseOut();
+		void handleMouseMove();
 		
 	protected:
 		// elements tree
@@ -110,9 +113,11 @@ class Element
 		float m_vertices[8];
 		
 		// lua callbacks
-		int m_onClick;
+		int m_onMouseDown;
+		int m_onMouseUp;
 		int m_onMouseOver;
 		int m_onMouseOut;
+		int m_onMouseMove;
 		
 	protected:
 		void saveChildTag(Element* child);
@@ -155,9 +160,11 @@ class Element
 		void setAttrBackgroundRepeat(std::string attrValue);
 		
 		void setAttrOnEvent(std::string attrValue, int* handler);
-		void setAttrOnClick(std::string attrValue);
+		void setAttrOnMouseDown(std::string attrValue);
+		void setAttrOnMouseUp(std::string attrValue);
 		void setAttrOnMouseOver(std::string attrValue);
 		void setAttrOnMouseOut(std::string attrValue);
+		void setAttrOnMouseMove(std::string attrValue);
 };
 	
 }

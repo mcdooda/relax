@@ -1,17 +1,33 @@
-<block size="310 310"
-	padding="50 50 50 50"
+<block
+	size="400 140"
+	color="220 220 220 255"
 	anchor="center center"
-	color="255 0 0 255"
-	onclick="print('click: '..tostring(self))"
-	onmouseover="print('mouseover: '..tostring(self))"
-	onmouseout="print('mouseout: '..tostring(self))">
-
-	<block size="250 250"
-		padding="50 50 50 50"
-		anchor="center center"
+	padding="30 30 30 30">
+	
+	<slider
+		size-y="20"
+		anchor="center top"
 		color="0 0 255 255"
-		onclick="print('click: '..tostring(self))"
-		onmouseover="print('mouseover: '..tostring(self))"
-		onmouseout="print('mouseout: '..tostring(self))" />
+		onmouseout="clearslider(self)"
+		onmousemove="slider(self)"
+		onmousedown="printslider(self)" />
+	
+	<slider
+		size-y="20"
+		position-y="30"
+		anchor="center top"
+		color="0 0 255 255"
+		onmouseout="clearslider(self)"
+		onmousemove="slider(self)"
+		onmousedown="printslider(self)" />
+	
+	<slider
+		size-y="20"
+		position-y="60"
+		anchor="center top"
+		color="0 0 255 255"
+		onmouseout="clearslider(self)"
+		onmousemove="slider(self)"
+		onmousedown="printslider(self)" />
 	
 </block>

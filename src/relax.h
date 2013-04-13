@@ -18,7 +18,7 @@ typedef SDLKey Key;
 class Relax : public Element
 {
 	public:
-		static void init(lua_State* L1 = NULL);
+		static void init(lua_State* L1);
 		static void quit();
 		static void setLuaState(lua_State* L1);
 		static lua_State* getLuaState();
@@ -29,7 +29,6 @@ class Relax : public Element
 		static void unsaveTag(Element* element);
 		static std::set<Element*> getElementsByTag(std::string tag);
 		inline static void setOverElement(Element* element) { over = element; }
-		static Vector2 getMouse();
 		
 		/* public */
 		
@@ -43,7 +42,7 @@ class Relax : public Element
 		bool isMousePressed(int button);
 		bool isMouseJustPressed(int button);
 		bool isMouseJustReleased(int button);
-		Vector2 getMousePosition();
+		inline static Vector2 getMouse() { return mouse; }
 		
 		bool operator!() const { return !m_open; }
 		inline void close() { m_open = false; }
@@ -64,8 +63,11 @@ class Relax : public Element
 	private:
 		/* methods */
 		void updateSize(Vector2 newSize);
+		
+		void checkMouseDown();
+		void checkMouseUp();
 		void checkMouseOver();
-		void checkClick();
+		void checkMouseMove();
 		
 	private:
 		/* static */

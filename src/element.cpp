@@ -4,6 +4,7 @@
 #include "element.h"
 #include "exception.h"
 #include "xml.h"
+#include "api/element.h"
 
 namespace relax
 {
@@ -15,9 +16,11 @@ Element::Element(std::string tag) :
 	m_parent(NULL),
 	m_anchor(TOP | LEFT),
 	m_background(NULL),
-	m_onClick(LUA_NOREF),
+	m_onMouseDown(LUA_NOREF),
+	m_onMouseUp(LUA_NOREF),
 	m_onMouseOver(LUA_NOREF),
-	m_onMouseOut(LUA_NOREF)
+	m_onMouseOut(LUA_NOREF),
+	m_onMouseMove(LUA_NOREF)
 {
 	
 }
@@ -28,7 +31,7 @@ Element::~Element()
 		m_parent->m_children.remove(this);
 	
 	lua_State* L = Relax::getLuaState();
-	luaL_unref(L, LUA_REGISTRYINDEX, m_onClick);
+	luaL_unref(L, LUA_REGISTRYINDEX, m_onMouseDown);
 	luaL_unref(L, LUA_REGISTRYINDEX, m_onMouseOver);
 	luaL_unref(L, LUA_REGISTRYINDEX, m_onMouseOut);
 	
@@ -53,17 +56,17 @@ void Element::setAttribute(std::string attrName, std::string attrValue)
 			AttrSetter attrSetter = it->second;
 			(this->*attrSetter)(attrValue);
 		}
-		catch (Exception ex)
+		catch (Exception& ex)
 		{
 			if (ex.hasMessage())
-				throw Exception(std::string("Error while handling value '" + attrValue + "' for attribute '" + attrName + "': ") + ex.getMessage());
+				throw Exception(std::string("Error while handling value '" + attrValue + "' for attribute '" + attrName + "': ") + ex.getMessage() + " in <" + m_tag + ">");
 				
 			else
-				throw Exception("Invalid value '" + attrValue + "' for attribute '" + attrName + "'");
+				throw Exception("Invalid value '" + attrValue + "' for attribute '" + attrName + "' in <" + m_tag + ">");
 		}
 	}
 	else
-		throw Exception("Unknown attribute '" + attrName + "'");
+		throw Exception("Unknown attribute '" + attrName + "' in <" + m_tag + ">");
 }
 
 void Element::addXML(const char* xml)
@@ -97,9 +100,14 @@ bool Element::isMouseOver()
 	return m_rectangle.contains(Relax::getMouse());
 }
 
-void Element::handleClick()
+void Element::handleMouseDown()
 {
-	handleEvent(m_onClick);
+	handleEvent(m_onMouseDown);
+}
+
+void Element::handleMouseUp()
+{
+	handleEvent(m_onMouseUp);
 }
 
 void Element::handleMouseOver()
@@ -110,6 +118,11 @@ void Element::handleMouseOver()
 void Element::handleMouseOut()
 {
 	handleEvent(m_onMouseOut);
+}
+
+void Element::handleMouseMove()
+{
+	handleEvent(m_onMouseMove);
 }
 
 void Element::saveChildTag(Element* child)
@@ -246,9 +259,11 @@ void Element::init()
 	attrSetters["background-image"] = &Element::setAttrBackgroundImage;
 	attrSetters["background-repeat"] = &Element::setAttrBackgroundRepeat;
 	
-	attrSetters["onclick"] = &Element::setAttrOnClick;
+	attrSetters["onmousedown"] = &Element::setAttrOnMouseDown;
+	attrSetters["onmouseup"] = &Element::setAttrOnMouseUp;
 	attrSetters["onmouseover"] = &Element::setAttrOnMouseOver;
 	attrSetters["onmouseout"] = &Element::setAttrOnMouseOut;
+	attrSetters["onmousemove"] = &Element::setAttrOnMouseMove;
 }
 
 void Element::quit()
@@ -263,7 +278,8 @@ void Element::handleEvent(int handler)
 		lua_State* L = Relax::getLuaState();
 		lua_pushinteger(L, handler);
 		lua_rawget(L, LUA_REGISTRYINDEX);
-		lua_pushlightuserdata(L, this);
+		api::element::newref(L, this);
+		//lua_pushlightuserdata(L, this);
 		int code = lua_pcall(L, 1, 0, 0);
 		if (code != LUA_OK)
 		{
@@ -576,9 +592,14 @@ void Element::setAttrOnEvent(std::string attrValue, int* handler)
 	*handler = luaL_ref(L, LUA_REGISTRYINDEX);
 }
 
-void Element::setAttrOnClick(std::string attrValue)
+void Element::setAttrOnMouseDown(std::string attrValue)
 {
-	setAttrOnEvent(attrValue, &m_onClick);
+	setAttrOnEvent(attrValue, &m_onMouseDown);
+}
+
+void Element::setAttrOnMouseUp(std::string attrValue)
+{
+	setAttrOnEvent(attrValue, &m_onMouseUp);
 }
 
 void Element::setAttrOnMouseOver(std::string attrValue)
@@ -589,6 +610,11 @@ void Element::setAttrOnMouseOver(std::string attrValue)
 void Element::setAttrOnMouseOut(std::string attrValue)
 {
 	setAttrOnEvent(attrValue, &m_onMouseOut);
+}
+
+void Element::setAttrOnMouseMove(std::string attrValue)
+{
+	setAttrOnEvent(attrValue, &m_onMouseMove);
 }
 
 }

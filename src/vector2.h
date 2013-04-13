@@ -1,6 +1,8 @@
 #ifndef RELAX_VECTOR2_H
 #define RELAX_VECTOR2_H
 
+#include <cmath>
+
 namespace relax
 {
 
@@ -17,8 +19,8 @@ class Vector2
 		inline float getY() const { return m_y; }
 		
 		void setR(float r);
-		float getR();
-		float getRSq();
+		inline float getR() { return sqrt(getRSq()); }
+		inline float getRSq() { return m_x * m_x + m_y * m_y; }
 		
 		void setTheta(float theta);
 		float getTheta();

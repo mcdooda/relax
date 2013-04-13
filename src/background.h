@@ -34,6 +34,9 @@ class Background
 		Texture* m_image;
 		Repeat m_repeat;
 		float m_textureCoords[8];
+		
+	private:
+	    void initCoords();
 };
 
 }

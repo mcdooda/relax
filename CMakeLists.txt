@@ -3,13 +3,13 @@ cmake_minimum_required(VERSION 2.6)
 project(relax)
 
 file(
-	GLOB
+	GLOB_RECURSE
 	src
 	src/*
 	test/*
 )
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -Werror -std=c++11")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -Werror -ansi")
 
 add_executable(
 	relax

@@ -13,8 +13,9 @@ int main(int argc, char* argv[])
 		
 		Relax::init(L);
 		
-		Relax r(Vector2(1000, 1000), false, true);
+		Relax r;
 		r.addXMLFile("test/ui.xml");
+		r.runScript("test/init.lua");
 		
 		r.update();
 		

@@ -51,43 +51,61 @@ static void parseString(const char* xml, void* userData, bool addFakeRoot = fals
 	XML_Parser parser = XML_ParserCreate(NULL);
 	XML_SetUserData(parser, userData);
 	
-	int parsed = 1;
+	try {
 	
-	if (parsed && addFakeRoot)
-	{
-		XML_SetStartElementHandler(parser, NULL);
-		XML_SetEndElementHandler(parser, NULL);
-		XML_SetCharacterDataHandler(parser, NULL);
-		parsed = XML_Parse(parser, "<root>", 6, 0);
-	}
+		int parsed = 1;
 	
-	if (parsed)
-	{
+		if (addFakeRoot)
+		{
+			XML_SetStartElementHandler(parser, NULL);
+			XML_SetEndElementHandler(parser, NULL);
+			XML_SetCharacterDataHandler(parser, NULL);
+			parsed = XML_Parse(parser, "<root>", 6, 0);
+			
+			if (!parsed)
+				throw Exception();
+		}
+	
 		XML_SetStartElementHandler(parser, startElement);
 		XML_SetEndElementHandler(parser, endElement);
 		XML_SetCharacterDataHandler(parser, characterData);
 		parsed = XML_Parse(parser, xml, strlen(xml), !addFakeRoot);
+		
+		if (!parsed)
+			throw Exception();
+	
+		if (addFakeRoot)
+		{
+			XML_SetStartElementHandler(parser, NULL);
+			XML_SetEndElementHandler(parser, NULL);
+			XML_SetCharacterDataHandler(parser, NULL);
+			parsed = XML_Parse(parser, "</root>", 7, 1);
+			
+			if (!parsed)
+				throw Exception();
+		}
+	
 	}
-	
-	if (parsed && addFakeRoot)
+	catch (Exception& ex)
 	{
-		XML_SetStartElementHandler(parser, NULL);
-		XML_SetEndElementHandler(parser, NULL);
-		XML_SetCharacterDataHandler(parser, NULL);
-		parsed = XML_Parse(parser, "</root>", 7, 1);
-	}
-	
-	XML_ParserFree(parser);
-	
-	if (!parsed)
-	{
+		XML_ParserFree(parser);
+		
 		std::stringstream ss;
-		ss << "Error while parsing XML: ";
-		ss << XML_ErrorString(XML_GetErrorCode(parser));
+		if (ex.hasMessage())
+		{
+			ss << ex.getMessage();
+		}
+		else
+		{
+			ss << "Error while parsing XML: ";
+			ss << XML_ErrorString(XML_GetErrorCode(parser));
+		}
 		ss << " at line ";
 		ss << XML_GetCurrentLineNumber(parser);
 		throw Exception(ss.str());
 	}
+	
+	XML_ParserFree(parser);
 }
 
 static void parseFile(const char* fileName, void* userData, bool addFakeRoot = false)
@@ -95,18 +113,21 @@ static void parseFile(const char* fileName, void* userData, bool addFakeRoot = f
 	XML_Parser parser = XML_ParserCreate(NULL);
 	XML_SetUserData(parser, userData);
 	
-	int parsed = 1;
+	try {
 	
-	if (parsed && addFakeRoot)
-	{
-		XML_SetStartElementHandler(parser, NULL);
-		XML_SetEndElementHandler(parser, NULL);
-		XML_SetCharacterDataHandler(parser, NULL);
-		parsed = XML_Parse(parser, "<root>", 6, 0);
-	}
+		int parsed = 1;
 	
-	if (parsed)
-	{
+		if (addFakeRoot)
+		{
+			XML_SetStartElementHandler(parser, NULL);
+			XML_SetEndElementHandler(parser, NULL);
+			XML_SetCharacterDataHandler(parser, NULL);
+			parsed = XML_Parse(parser, "<root>", 6, 0);
+			
+			if (!parsed)
+				throw Exception();
+		}
+	
 		XML_SetStartElementHandler(parser, startElement);
 		XML_SetEndElementHandler(parser, endElement);
 		XML_SetCharacterDataHandler(parser, characterData);
@@ -120,34 +141,52 @@ static void parseFile(const char* fileName, void* userData, bool addFakeRoot = f
 		{
 			fgets(line, sizeof(line), f);
 			if (!feof(f))
+			{
 				parsed = XML_Parse(parser, line, strlen(line), 0);
+				if (!parsed)
+					throw Exception();
+			}
 		}
 		
 		if (!addFakeRoot)
 			XML_Parse(parser, "", 0, 1);
 		
 		fclose(f);
-	}
 	
-	if (parsed && addFakeRoot)
+		if (addFakeRoot)
+		{
+			XML_SetStartElementHandler(parser, NULL);
+			XML_SetEndElementHandler(parser, NULL);
+			XML_SetCharacterDataHandler(parser, NULL);
+			parsed = XML_Parse(parser, "</root>", 7, 1);
+			
+			if (!parsed)
+				throw Exception();
+		}
+	
+	}
+	catch (Exception& ex)
 	{
-		XML_SetStartElementHandler(parser, NULL);
-		XML_SetEndElementHandler(parser, NULL);
-		XML_SetCharacterDataHandler(parser, NULL);
-		parsed = parsed && XML_Parse(parser, "</root>", 7, 1);
+		XML_ParserFree(parser);
+		
+		std::stringstream ss;
+		if (ex.hasMessage())
+		{
+			ss << ex.getMessage();
+		}
+		else
+		{
+			ss << "Error while parsing XML: ";
+			ss << XML_ErrorString(XML_GetErrorCode(parser));
+		}
+		ss << " at line ";
+		ss << XML_GetCurrentLineNumber(parser);
+		ss << " in file ";
+		ss << fileName;
+		throw Exception(ss.str());
 	}
 	
 	XML_ParserFree(parser);
-	
-	if (!parsed)
-	{
-		std::stringstream ss;
-		ss << "Error while parsing XML: ";
-		ss << XML_ErrorString(XML_GetErrorCode(parser));
-		ss << " at line ";
-		ss << XML_GetCurrentLineNumber(parser);
-		throw Exception(ss.str());
-	}
 }
 
 Element* elementFromXML(const char* xml)

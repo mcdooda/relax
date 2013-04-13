@@ -27,16 +27,6 @@ void Vector2::setR(float r)
 	m_y *= ratio;
 }
 
-float Vector2::getR()
-{
-	return sqrt(m_x * m_x + m_y * m_y);
-}
-
-float Vector2::getRSq()
-{
-	return m_x * m_x + m_y * m_y;
-}
-
 void Vector2::setTheta(float theta)
 {
 	float r = getR();

@@ -5,6 +5,8 @@
 #include "relax.h"
 #include "xml.h"
 #include "font.h"
+#include "api/element.h"
+#include "api/mouse.h"
 
 namespace relax
 {
@@ -21,8 +23,6 @@ Element* Relax::previousOver;
 
 void Relax::init(lua_State* L1)
 {
-	L = L1;
-	
 	if (SDL_Init(SDL_INIT_VIDEO) < 0)
 		throw Exception(SDL_GetError());
 		
@@ -35,6 +35,10 @@ void Relax::init(lua_State* L1)
 	
 	over = NULL;
 	previousOver = NULL;
+	
+    L = L1;
+    api::element::open(L);
+    api::mouse::open(L);
 }
 
 void Relax::quit()
@@ -103,11 +107,6 @@ std::set<Element*> Relax::getElementsByTag(std::string tag)
 		return std::set<Element*>();
 }
 
-Vector2 Relax::getMouse()
-{
-	return mouse;
-}
-
 Relax::Relax(Vector2 size, bool fullScreen, bool resizable) :
 	Element("relax"),
 	m_videoFlags(SDL_OPENGL),
@@ -171,15 +170,17 @@ void Relax::pumpEvents()
 			mouse.setX(event.motion.x);
 			mouse.setY(event.motion.y);
 			checkMouseOver();
+			checkMouseMove();
 			break;
 			
 			case SDL_MOUSEBUTTONDOWN:
 			justPressedButtons[event.button.button] = true;
-			checkClick();
+			checkMouseDown();
 			break;
 			
 			case SDL_MOUSEBUTTONUP:
 			justReleasedButtons[event.button.button] = true;
+			checkMouseUp();
 			break;
 			
 			case SDL_QUIT:
@@ -205,11 +206,6 @@ bool Relax::isJustReleased(Key key)
 	return justReleasedKeys[key];
 }
 
-Vector2 Relax::getMousePosition()
-{
-	return mouse;
-}
-
 void Relax::runScript(const char* fileName)
 {
 	luaL_dofile(L, fileName);
@@ -231,6 +227,18 @@ void Relax::updateSize(Vector2 newSize)
 	gluOrtho2D(0, newSize.getX(), newSize.getY(), 0);
 }
 
+void Relax::checkMouseDown()
+{
+	if (over != NULL)
+		over->handleMouseDown();
+}
+
+void Relax::checkMouseUp()
+{
+	if (over != NULL)
+		over->handleMouseUp();
+}
+
 void Relax::checkMouseOver()
 {
 	previousOver = over;
@@ -246,10 +254,10 @@ void Relax::checkMouseOver()
 	}
 }
 
-void Relax::checkClick()
+void Relax::checkMouseMove()
 {
 	if (over != NULL)
-		over->handleClick();
+		over->handleMouseMove();
 }
 
 }
