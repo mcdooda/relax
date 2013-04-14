@@ -128,6 +128,8 @@ class Element
 		static void init();
 		static void quit();
 		
+		void checkLuaError(lua_State* L, int code);
+		
 		void handleEvent(int handler);
 		
 		// attribute modifiers

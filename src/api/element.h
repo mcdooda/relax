@@ -13,7 +13,7 @@ namespace element
 
 void open(lua_State* L);
 
-int newref(lua_State* L, Element* element);
+void newref(lua_State* L, Element* element);
 
 int tostring(lua_State* L);
 int gettag(lua_State* L);
@@ -21,6 +21,10 @@ int setattribute(lua_State* L);
 int getsize(lua_State* L);
 int getabsoluteposition(lua_State* L);
 int getposition(lua_State* L);
+
+/* element.* functions */
+int getbytag(lua_State* L);
+int style(lua_State* L);
 
 }
 }

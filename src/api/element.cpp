@@ -1,5 +1,5 @@
 #include "element.h"
-#include "../element.h"
+#include "../relax.h"
 
 namespace relax
 {
@@ -18,21 +18,30 @@ static const struct luaL_Reg lib_m[] = {
     {NULL, NULL}
 };
 
+static const struct luaL_Reg lib_f[] = {
+	{"getbytag", getbytag},
+	{"style",    style},
+	{NULL, NULL}
+};
+
 void open(lua_State* L)
 {
     luaL_newmetatable(L, "Relax.Element");
     lua_pushvalue(L, -1);
     lua_setfield(L, -2, "__index");
     luaL_setfuncs(L, lib_m, 0);
+    lua_pop(L, 1);
+    
+    luaL_newlib(L, lib_f);
+    lua_setglobal(L, "element");
 }
 
-int newref(lua_State* L, Element* element)
+void newref(lua_State* L, Element* element)
 {
     Element** e = (Element**) lua_newuserdata(L, sizeof(Element*));
     luaL_getmetatable(L, "Relax.Element");
     lua_setmetatable(L, -2);
     *e = element;
-    return 1;
 }
 
 #define checkElement(L) (*(Element**) luaL_checkudata(L, 1, "Relax.Element"))
@@ -85,6 +94,48 @@ int getposition(lua_State* L)
 	lua_pushinteger(L, position.getX());
 	lua_pushinteger(L, position.getY());
 	return 2;
+}
+
+int getbytag(lua_State* L)
+{
+	std::string tag = luaL_checkstring(L, 1);
+	std::set<Element*> elements = Relax::getElementsByTag(tag);
+	lua_createtable(L, elements.size(), 0);
+	int i = 1;
+	for (std::set<Element*>::iterator it = elements.begin(); it != elements.end(); it++)
+	{
+		lua_pushinteger(L, i);
+		newref(L, *it);
+		lua_rawset(L, -3);
+		i++;
+	}
+	return 1;
+}
+
+int style(lua_State* L)
+{
+	luaL_checktype(L, 1, LUA_TTABLE);
+	lua_pushnil(L);
+	while (lua_next(L, 1) != 0)
+	{
+		std::string tag = luaL_checkstring(L, -2);
+		std::set<Element*> elements = Relax::getElementsByTag(tag);
+		luaL_checktype(L, -1, LUA_TTABLE);
+		lua_pushnil(L);
+		while (lua_next(L, -2) != 0)
+		{
+			std::string attrName = luaL_checkstring(L, -2);
+			std::string attrValue = luaL_checkstring(L, -1);
+			for (std::set<Element*>::iterator it = elements.begin(); it != elements.end(); it++)
+			{
+				// TODO: optimize loading of lua code (1 per attribute instead of 1 per element per attribute)
+				(*it)->setAttribute(attrName, attrValue);
+			}
+			lua_pop(L, 1);
+		}
+		lua_pop(L, 1);
+	}
+	return 0;
 }
 
 }

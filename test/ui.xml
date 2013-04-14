@@ -1,33 +1,6 @@
-<block
-	size="400 140"
-	color="220 220 220 255"
-	anchor="center center"
-	padding="30 30 30 30">
-	
-	<slider
-		size-y="20"
-		anchor="center top"
-		color="0 0 255 255"
-		onmouseout="clearslider(self)"
-		onmousemove="slider(self)"
-		onmousedown="printslider(self)" />
-	
-	<slider
-		size-y="20"
-		position-y="30"
-		anchor="center top"
-		color="0 0 255 255"
-		onmouseout="clearslider(self)"
-		onmousemove="slider(self)"
-		onmousedown="printslider(self)" />
-	
-	<slider
-		size-y="20"
-		position-y="60"
-		anchor="center top"
-		color="0 0 255 255"
-		onmouseout="clearslider(self)"
-		onmousemove="slider(self)"
-		onmousedown="printslider(self)" />
-	
+<block>
+	<slider />
+	<slider />
+	<slider />
+	<slider />
 </block>

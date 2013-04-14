@@ -208,7 +208,8 @@ bool Relax::isJustReleased(Key key)
 
 void Relax::runScript(const char* fileName)
 {
-	luaL_dofile(L, fileName);
+	int code = luaL_dofile(L, fileName);
+	checkLuaError(L, code);
 }
 
 void Relax::updateSize(Vector2 newSize)

@@ -271,6 +271,29 @@ void Element::quit()
 	
 }
 
+void Element::checkLuaError(lua_State* L, int code)
+{
+	if (code != LUA_OK)
+	{
+		switch (code)
+		{
+			case LUA_ERRRUN:
+			std::cerr << "runtime error:" << std::endl;
+			break;
+			
+			case LUA_ERRMEM:
+			std::cerr << "memory allocation error:" << std::endl;
+			break;
+			
+			case LUA_ERRGCMM:
+			std::cerr << "error while running a __gc metamethod:" << std::endl;
+			break;
+		}
+		std::cerr << lua_tostring(L, -1) << std::endl;
+		lua_pop(L, 1);
+	}
+}
+
 void Element::handleEvent(int handler)
 {
 	if (handler != LUA_NOREF)
@@ -281,25 +304,7 @@ void Element::handleEvent(int handler)
 		api::element::newref(L, this);
 		//lua_pushlightuserdata(L, this);
 		int code = lua_pcall(L, 1, 0, 0);
-		if (code != LUA_OK)
-		{
-			switch (code)
-			{
-				case LUA_ERRRUN:
-				std::cerr << "runtime error:" << std::endl;
-				break;
-				
-				case LUA_ERRMEM:
-				std::cerr << "memory allocation error:" << std::endl;
-				break;
-				
-				case LUA_ERRGCMM:
-				std::cerr << "error while running a __gc metamethod:" << std::endl;
-				break;
-			}
-			std::cerr << lua_tostring(L, -1) << std::endl;
-			lua_pop(L, 1);
-		}
+		checkLuaError(L, code);
 	}
 }
 
@@ -587,9 +592,11 @@ void Element::setAttrOnEvent(std::string attrValue, int* handler)
 {
 	lua_State* L = Relax::getLuaState();
 	luaL_unref(L, LUA_REGISTRYINDEX, *handler);
-	std::string code = "local self = ...; " + attrValue;
-	luaL_loadstring(L, code.c_str());
-	*handler = luaL_ref(L, LUA_REGISTRYINDEX);
+	std::string fullCode = "local self = ...; " + attrValue;
+	int code = luaL_loadstring(L, fullCode.c_str());
+	checkLuaError(L, code);
+	if (code == LUA_OK)
+		*handler = luaL_ref(L, LUA_REGISTRYINDEX);
 }
 
 void Element::setAttrOnMouseDown(std::string attrValue)
