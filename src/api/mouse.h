@@ -12,7 +12,7 @@ namespace mouse
 
 void open(lua_State* L);
 
-int getposition(lua_State* L);
+int getPosition(lua_State* L);
 
 }
 }

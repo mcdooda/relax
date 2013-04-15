@@ -12,7 +12,7 @@ namespace relax
 {
 
 lua_State* Relax::L;
-std::map<std::string, std::set<Element*> > Relax::elementsByTag;
+std::map<std::string, std::set<Element*> > Relax::elementsByTagName;
 bool Relax::justPressedKeys[SDLK_LAST];
 bool Relax::justReleasedKeys[SDLK_LAST];
 bool Relax::justPressedButtons[RELAX_NUM_BUTTONS];
@@ -43,7 +43,7 @@ void Relax::init(lua_State* L1)
 
 void Relax::quit()
 {
-	elementsByTag.clear();
+	elementsByTagName.clear();
 	
 	Element::quit();
 	Texture::quit();
@@ -71,36 +71,36 @@ Vector2 Relax::getDesktopResolution()
 void Relax::saveTag(Element* element)
 {
 	std::string tag = element->getTag();
-	std::map<std::string, std::set<Element*> >::iterator it = elementsByTag.find(tag);
+	std::map<std::string, std::set<Element*> >::iterator it = elementsByTagName.find(tag);
 	
-	if (it != elementsByTag.end())
+	if (it != elementsByTagName.end())
 	{
 		it->second.insert(element);
 	}
 	else
 	{
-		elementsByTag[tag] = std::set<Element*>();
-		elementsByTag[tag].insert(element);
+		elementsByTagName[tag] = std::set<Element*>();
+		elementsByTagName[tag].insert(element);
 	}
 }
 
 void Relax::unsaveTag(Element* element)
 {
 	std::string tag = element->getTag();
-	std::map<std::string, std::set<Element*> >::iterator it = elementsByTag.find(tag);
+	std::map<std::string, std::set<Element*> >::iterator it = elementsByTagName.find(tag);
 	
 	if (it->second.size() == 1)
-		elementsByTag.erase(it);
+		elementsByTagName.erase(it);
 		
 	else
 		it->second.erase(element);
 }
 
-std::set<Element*> Relax::getElementsByTag(std::string tag)
+std::set<Element*> Relax::getElementsByTagName(std::string tag)
 {
-	std::map<std::string, std::set<Element*> >::iterator it = elementsByTag.find(tag);
+	std::map<std::string, std::set<Element*> >::iterator it = elementsByTagName.find(tag);
 	
-	if (it != elementsByTag.end())
+	if (it != elementsByTagName.end())
 		return it->second;
 		
 	else

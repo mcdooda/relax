@@ -301,7 +301,7 @@ void Element::handleEvent(int handler)
 		lua_State* L = Relax::getLuaState();
 		lua_pushinteger(L, handler);
 		lua_rawget(L, LUA_REGISTRYINDEX);
-		api::element::newref(L, this);
+		api::element::newRef(L, this);
 		//lua_pushlightuserdata(L, this);
 		int code = lua_pcall(L, 1, 0, 0);
 		checkLuaError(L, code);
@@ -593,6 +593,7 @@ void Element::setAttrOnEvent(std::string attrValue, int* handler)
 	lua_State* L = Relax::getLuaState();
 	luaL_unref(L, LUA_REGISTRYINDEX, *handler);
 	std::string fullCode = "local self = ...; " + attrValue;
+	//std::cout << "compiling code: " << fullCode << std::endl;
 	int code = luaL_loadstring(L, fullCode.c_str());
 	checkLuaError(L, code);
 	if (code == LUA_OK)

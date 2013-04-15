@@ -9,18 +9,18 @@ namespace element
 {
 
 static const struct luaL_Reg lib_m[] = {
-    {"__tostring",          tostring},
-    {"gettag",              gettag},
-    {"setattribute",        setattribute},
-    {"getsize",             getsize},
-    {"getabsoluteposition", getabsoluteposition},
-    {"getposition",         getposition},
+    {"__tostring",          toString},
+    {"getTag",              getTag},
+    {"setAttribute",        setAttribute},
+    {"getSize",             getSize},
+    {"getAbsolutePosition", getAbsolutePosition},
+    {"getPosition",         getPosition},
     {NULL, NULL}
 };
 
 static const struct luaL_Reg lib_f[] = {
-	{"getbytag", getbytag},
-	{"style",    style},
+	{"getByTagName", getByTagName},
+	{"style",        style},
 	{NULL, NULL}
 };
 
@@ -36,7 +36,7 @@ void open(lua_State* L)
     lua_setglobal(L, "element");
 }
 
-void newref(lua_State* L, Element* element)
+void newRef(lua_State* L, Element* element)
 {
     Element** e = (Element**) lua_newuserdata(L, sizeof(Element*));
     luaL_getmetatable(L, "Relax.Element");
@@ -46,21 +46,21 @@ void newref(lua_State* L, Element* element)
 
 #define checkElement(L) (*(Element**) luaL_checkudata(L, 1, "Relax.Element"))
 
-int tostring(lua_State* L)
+int toString(lua_State* L)
 {
     Element* element = checkElement(L);
     lua_pushfstring(L, "<%s /> (%p)", element->getTag().c_str(), element);
     return 1;
 }
 
-int gettag(lua_State* L)
+int getTag(lua_State* L)
 {
     Element* element = checkElement(L);
     lua_pushstring(L, element->getTag().c_str());
     return 1;
 }
 
-int setattribute(lua_State* L)
+int setAttribute(lua_State* L)
 {
 	Element* element = checkElement(L);
 	std::string attrName = luaL_checkstring(L, 2);
@@ -69,7 +69,7 @@ int setattribute(lua_State* L)
 	return 0;
 }
 
-int getsize(lua_State* L)
+int getSize(lua_State* L)
 {
 	Element* element = checkElement(L);
 	Vector2 size = element->getComputedSize();
@@ -78,7 +78,7 @@ int getsize(lua_State* L)
 	return 2;
 }
 
-int getabsoluteposition(lua_State* L)
+int getAbsolutePosition(lua_State* L)
 {
 	Element* element = checkElement(L);
 	Vector2 absolutePosition = element->getAbsolutePosition();
@@ -87,7 +87,7 @@ int getabsoluteposition(lua_State* L)
 	return 2;
 }
 
-int getposition(lua_State* L)
+int getPosition(lua_State* L)
 {
 	Element* element = checkElement(L);
 	Vector2 position = element->getAbsolutePosition();
@@ -96,16 +96,16 @@ int getposition(lua_State* L)
 	return 2;
 }
 
-int getbytag(lua_State* L)
+int getByTagName(lua_State* L)
 {
 	std::string tag = luaL_checkstring(L, 1);
-	std::set<Element*> elements = Relax::getElementsByTag(tag);
+	std::set<Element*> elements = Relax::getElementsByTagName(tag);
 	lua_createtable(L, elements.size(), 0);
 	int i = 1;
 	for (std::set<Element*>::iterator it = elements.begin(); it != elements.end(); it++)
 	{
 		lua_pushinteger(L, i);
-		newref(L, *it);
+		newRef(L, *it);
 		lua_rawset(L, -3);
 		i++;
 	}
@@ -119,7 +119,7 @@ int style(lua_State* L)
 	while (lua_next(L, 1) != 0)
 	{
 		std::string tag = luaL_checkstring(L, -2);
-		std::set<Element*> elements = Relax::getElementsByTag(tag);
+		std::set<Element*> elements = Relax::getElementsByTagName(tag);
 		luaL_checktype(L, -1, LUA_TTABLE);
 		lua_pushnil(L);
 		while (lua_next(L, -2) != 0)

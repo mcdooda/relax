@@ -1,29 +1,29 @@
-local function getslidervalue(e)
-	local x, y = e:getposition()
-	local sx, sy = e:getsize()
-	local mx, my = mouse.getposition()
+local function getSliderValue(e)
+	local x, y = e:getPosition()
+	local sx, sy = e:getSize()
+	local mx, my = mouse.getPosition()
 	return ((mx - x) / sx)
 end
 
 function slider(e)
-	local value = getslidervalue(e)
-	e:setattribute('color', math.floor((1 - value) * 255)..' '..math.floor(value * 255)..' 0 255')
-	local sx, sy = e:getsize()
-	e:setattribute('padding-left', value * sx)
+	local value = getSliderValue(e)
+	e:setAttribute('color', math.floor((1 - value) * 255)..' '..math.floor(value * 255)..' 0 255')
+	local sx, sy = e:getSize()
+	e:setAttribute('padding-left', value * sx)
 end
 
-function printslider(e)
+function printSlider(e)
 	print(e)
-	print(getslidervalue(e))
+	print(getSliderValue(e))
 end
 
-function clearslider(e)
-	e:setattribute('color', '0 0 255 255')
+function clearSlider(e)
+	e:setAttribute('color', '0 0 255 255')
 end
 
 local y = 0
-for k, e in pairs(element.getbytag('slider')) do
-	e:setattribute('position-y', y)
+for k, e in pairs(element.getByTagName('slider')) do
+	e:setAttribute('position-y', y)
 	y = y + 30
 end
 
@@ -32,9 +32,9 @@ element.style {
 		['size-y']       = 20,
 		['anchor']       = 'center top',
 		['color']        = '0 0 255 255',
-		['onmouseout']   = 'clearslider(self)',
+		['onmouseout']   = 'clearSlider(self)',
 		['onmousemove']  = 'slider(self)',
-		['onmousedown']  = 'printslider(self)',
+		['onmousedown']  = 'printSlider(self)',
 		['padding-left'] = 30,
 		['background']   = 'test/background.png repeat'
 	},

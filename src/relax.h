@@ -27,7 +27,7 @@ class Relax : public Element
 		/* private api */
 		static void saveTag(Element* element);
 		static void unsaveTag(Element* element);
-		static std::set<Element*> getElementsByTag(std::string tag);
+		static std::set<Element*> getElementsByTagName(std::string tag);
 		inline static void setOverElement(Element* element) { over = element; }
 		
 		/* public */
@@ -72,7 +72,7 @@ class Relax : public Element
 	private:
 		/* static */
 		static lua_State* L;
-		static std::map<std::string, std::set<Element*> > elementsByTag;
+		static std::map<std::string, std::set<Element*> > elementsByTagName;
 		static bool justPressedKeys[SDLK_LAST];
 		static bool justReleasedKeys[SDLK_LAST];
 		static bool justPressedButtons[RELAX_NUM_BUTTONS];
