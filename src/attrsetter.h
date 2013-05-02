@@ -4,19 +4,25 @@
 #include <list>
 #include "element.h"
 #include "background.h"
+#include "anchor.h"
 
 namespace relax
 {
+class Element;
 
 class AttrSetter
 {
 	public:
+		virtual ~AttrSetter() {}
+		
 		virtual void set(Element* element) = 0;
 };
 
 class AttrSetterList : public AttrSetter
 {
 	public:
+		virtual ~AttrSetterList();
+	
 		virtual void set(Element* element);
 		
 		void add(AttrSetter* setter);
@@ -28,49 +34,59 @@ class AttrSetterList : public AttrSetter
 class AttrSetterAnchorX : public AttrSetter
 {
 	public:
-		AttrSetterAnchorX(Element::Anchor anchorX);
+		AttrSetterAnchorX(Anchor anchorX);
 		
 		virtual void set(Element* element);
 		
 	private:
-		Element::Anchor m_anchorX;
+		Anchor m_anchorX;
 };
 
 class AttrSetterAnchorY : public AttrSetter
 {
 	public:
-		AttrSetterAnchorY(Element::Anchor anchorY);
+		AttrSetterAnchorY(Anchor anchorY);
 		
 		virtual void set(Element* element);
 		
 	private:
-		Element::Anchor m_anchorY;
+		Anchor m_anchorY;
 };
 
 class AttrSetterSizeX : public AttrSetter
 {
 	public:
-		AttrSetterSizeX();
 		AttrSetterSizeX(float sizeX);
 		
 		virtual void set(Element* element);
 		
 	private:
 		float m_sizeX;
-		bool m_auto;
+};
+
+class AttrSetterSizeXAuto : public AttrSetter
+{
+	public:
+		
+		virtual void set(Element* element);
 };
 
 class AttrSetterSizeY : public AttrSetter
 {
 	public:
-		AttrSetterSizeY();
 		AttrSetterSizeY(float sizeY);
 		
 		virtual void set(Element* element);
 		
 	private:
 		float m_sizeY;
-		bool m_auto;
+};
+
+class AttrSetterSizeYAuto : public AttrSetter
+{
+	public:
+		
+		virtual void set(Element* element);
 };
 
 class AttrSetterPositionX : public AttrSetter

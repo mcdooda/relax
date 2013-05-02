@@ -12,6 +12,8 @@
 #include "size.h"
 #include "rectangle.h"
 #include "background.h"
+#include "anchor.h"
+#include "attrsetter.h"
 
 namespace relax
 {
@@ -19,17 +21,7 @@ namespace relax
 class Element
 {
 	public:
-		enum Anchor
-		{
-			LEFT	= 0x01,
-			RIGHT   = 0x02,
-			CENTERX = 0x04,
-			TOP	 	= 0x08,
-			BOTTOM  = 0x10,
-			CENTERY = 0x20
-		};
-		
-		typedef void (Element::*AttrSetter)(std::string attrValue);
+		typedef AttrSetter* (*AttrParser)(std::string attrValue);
 	
 	public:
 		Element(std::string tag);
@@ -76,9 +68,15 @@ class Element
 		inline Padding getPadding() const { return m_padding; }
 		
 		inline void setBackground(Background* background) { delete m_background; m_background = background; }
-		inline void setBackgroundImage(Texture* backgroundImage) { m_background->setImage(backgroundImage); }
-		inline void setBackgroundRepeat(Background::Repeat backgroundRepeat) { m_background->setRepeat(backgroundRepeat); }
+		inline void setBackgroundImage(Texture* backgroundImage) { if (m_background == NULL) m_background = new Background(); m_background->setImage(backgroundImage); }
+		inline void setBackgroundRepeat(Background::Repeat backgroundRepeat) { if (m_background == NULL) m_background = new Background(); m_background->setRepeat(backgroundRepeat); }
 		inline Background* getBackground() const { return m_background; }
+		
+		inline void setOnMouseDown(int onMouseDown) { m_onMouseDown = onMouseDown; }
+		inline void setOnMouseUp(int onMouseUp) { m_onMouseUp = onMouseUp; }
+		inline void setOnMouseOver(int onMouseOver) { m_onMouseOver = onMouseOver; }
+		inline void setOnMouseOut(int onMouseOut) { m_onMouseOut = onMouseOut; }
+		inline void setOnMouseMove(int onMouseMove) { m_onMouseMove = onMouseMove; }
 		
 		void setAttribute(std::string attrName, std::string attrValue);
 		
@@ -95,6 +93,8 @@ class Element
 		void handleMouseOver();
 		void handleMouseOut();
 		void handleMouseMove();
+		
+		static AttrSetter* getAttrSetter(std::string attrName, std::string attrValue);
 		
 	protected:
 		// elements tree
@@ -125,48 +125,48 @@ class Element
 		void draw();
 		void updatePosition();
 		
+		void handleEvent(int handler);
+		
 		static void init();
 		static void quit();
 		
-		void checkLuaError(lua_State* L, int code);
-		
-		void handleEvent(int handler);
+		static void checkLuaError(lua_State* L, int code);
 		
 		// attribute modifiers
-		void setAttrAnchor(std::string attrValue);
-		void setAttrAnchorX(std::string attrValue);
-		void setAttrAnchorY(std::string attrValue);
+		static AttrSetter* setAttrAnchor(std::string attrValue);
+		static AttrSetter* setAttrAnchorX(std::string attrValue);
+		static AttrSetter* setAttrAnchorY(std::string attrValue);
 		
-		void setAttrSize(std::string attrValue);
-		void setAttrSizeX(std::string attrValue);
-		void setAttrSizeY(std::string attrValue);
+		static AttrSetter* setAttrSize(std::string attrValue);
+		static AttrSetter* setAttrSizeX(std::string attrValue);
+		static AttrSetter* setAttrSizeY(std::string attrValue);
 		
-		void setAttrPosition(std::string attrValue);
-		void setAttrPositionX(std::string attrValue);
-		void setAttrPositionY(std::string attrValue);
+		static AttrSetter* setAttrPosition(std::string attrValue);
+		static AttrSetter* setAttrPositionX(std::string attrValue);
+		static AttrSetter* setAttrPositionY(std::string attrValue);
 		
-		void setAttrColor(std::string attrValue);
-		void setAttrColorRed(std::string attrValue);
-		void setAttrColorGreen(std::string attrValue);
-		void setAttrColorBlue(std::string attrValue);
-		void setAttrColorAlpha(std::string attrValue);
+		static AttrSetter* setAttrColor(std::string attrValue);
+		static AttrSetter* setAttrColorRed(std::string attrValue);
+		static AttrSetter* setAttrColorGreen(std::string attrValue);
+		static AttrSetter* setAttrColorBlue(std::string attrValue);
+		static AttrSetter* setAttrColorAlpha(std::string attrValue);
 		
-		void setAttrPadding(std::string attrValue);
-		void setAttrPaddingLeft(std::string attrValue);
-		void setAttrPaddingRight(std::string attrValue);
-		void setAttrPaddingTop(std::string attrValue);
-		void setAttrPaddingBottom(std::string attrValue);
+		static AttrSetter* setAttrPadding(std::string attrValue);
+		static AttrSetter* setAttrPaddingLeft(std::string attrValue);
+		static AttrSetter* setAttrPaddingRight(std::string attrValue);
+		static AttrSetter* setAttrPaddingTop(std::string attrValue);
+		static AttrSetter* setAttrPaddingBottom(std::string attrValue);
 		
-		void setAttrBackground(std::string attrValue);
-		void setAttrBackgroundImage(std::string attrValue);
-		void setAttrBackgroundRepeat(std::string attrValue);
+		static AttrSetter* setAttrBackground(std::string attrValue);
+		static AttrSetter* setAttrBackgroundImage(std::string attrValue);
+		static AttrSetter* setAttrBackgroundRepeat(std::string attrValue);
 		
-		void setAttrOnEvent(std::string attrValue, int* handler);
-		void setAttrOnMouseDown(std::string attrValue);
-		void setAttrOnMouseUp(std::string attrValue);
-		void setAttrOnMouseOver(std::string attrValue);
-		void setAttrOnMouseOut(std::string attrValue);
-		void setAttrOnMouseMove(std::string attrValue);
+		static int parseEventHandler(std::string attrValue);
+		static AttrSetter* setAttrOnMouseDown(std::string attrValue);
+		static AttrSetter* setAttrOnMouseUp(std::string attrValue);
+		static AttrSetter* setAttrOnMouseOver(std::string attrValue);
+		static AttrSetter* setAttrOnMouseOut(std::string attrValue);
+		static AttrSetter* setAttrOnMouseMove(std::string attrValue);
 };
 	
 }

@@ -1,3 +1,4 @@
+#include "element.h"
 #include "attrsetter.h"
 
 namespace relax
@@ -11,12 +12,20 @@ void AttrSetterList::set(Element* element)
 	}
 }
 
+AttrSetterList::~AttrSetterList()
+{
+	for (std::list<AttrSetter*>::iterator it = m_setters.begin(); it != m_setters.end(); it++)
+	{
+		delete *it;
+	}
+}
+
 void AttrSetterList::add(AttrSetter* setter)
 {
 	m_setters.push_back(setter);
 }
 
-AttrSetterAnchorX::AttrSetterAnchorX(Element::Anchor anchorX) :
+AttrSetterAnchorX::AttrSetterAnchorX(Anchor anchorX) :
 	m_anchorX(anchorX)
 {
 	
@@ -24,10 +33,10 @@ AttrSetterAnchorX::AttrSetterAnchorX(Element::Anchor anchorX) :
 
 void AttrSetterAnchorX::set(Element* element)
 {
-	
+	element->setAnchorX(m_anchorX);
 }
 
-AttrSetterAnchorY::AttrSetterAnchorY(Element::Anchor anchorY) :
+AttrSetterAnchorY::AttrSetterAnchorY(Anchor anchorY) :
 	m_anchorY(anchorY)
 {
 	
@@ -35,45 +44,39 @@ AttrSetterAnchorY::AttrSetterAnchorY(Element::Anchor anchorY) :
 
 void AttrSetterAnchorY::set(Element* element)
 {
-	
-}
-
-AttrSetterSizeX::AttrSetterSizeX() :
-	m_sizeX(0),
-	m_auto(true)
-{
-	
+	element->setAnchorY(m_anchorY);
 }
 
 AttrSetterSizeX::AttrSetterSizeX(float sizeX) :
-	m_sizeX(sizeX),
-	m_auto(false)
+	m_sizeX(sizeX)
 {
 	
 }
 
 void AttrSetterSizeX::set(Element* element)
 {
-	
+	element->setWidth(m_sizeX);
 }
 
-AttrSetterSizeY::AttrSetterSizeY() :
-	m_sizeY(0),
-	m_auto(true)
+void AttrSetterSizeXAuto::set(Element* element)
 {
-	
+	element->setWidthAuto();
 }
 
 AttrSetterSizeY::AttrSetterSizeY(float sizeY) :
-	m_sizeY(sizeY),
-	m_auto(false)
+	m_sizeY(sizeY)
 {
 	
 }
 
 void AttrSetterSizeY::set(Element* element)
 {
-	
+	element->setHeight(m_sizeY);
+}
+
+void AttrSetterSizeYAuto::set(Element* element)
+{
+	element->setHeightAuto();
 }
 
 AttrSetterPositionX::AttrSetterPositionX(float positionX) :
@@ -84,7 +87,7 @@ AttrSetterPositionX::AttrSetterPositionX(float positionX) :
 
 void AttrSetterPositionX::set(Element* element)
 {
-	
+	element->setX(m_positionX);
 }
 
 AttrSetterPositionY::AttrSetterPositionY(float positionY) :
@@ -95,7 +98,7 @@ AttrSetterPositionY::AttrSetterPositionY(float positionY) :
 
 void AttrSetterPositionY::set(Element* element)
 {
-	
+	element->setY(m_positionY);
 }
 
 AttrSetterColorRed::AttrSetterColorRed(unsigned char red) :
@@ -106,7 +109,7 @@ AttrSetterColorRed::AttrSetterColorRed(unsigned char red) :
 
 void AttrSetterColorRed::set(Element* element)
 {
-	
+	element->setRed(m_red);
 }
 
 AttrSetterColorGreen::AttrSetterColorGreen(unsigned char green) :
@@ -117,7 +120,7 @@ AttrSetterColorGreen::AttrSetterColorGreen(unsigned char green) :
 
 void AttrSetterColorGreen::set(Element* element)
 {
-	
+	element->setGreen(m_green);
 }
 
 AttrSetterColorBlue::AttrSetterColorBlue(unsigned char blue) :
@@ -128,7 +131,7 @@ AttrSetterColorBlue::AttrSetterColorBlue(unsigned char blue) :
 
 void AttrSetterColorBlue::set(Element* element)
 {
-	
+	element->setBlue(m_blue);
 }
 
 AttrSetterColorAlpha::AttrSetterColorAlpha(unsigned char alpha) :
@@ -139,7 +142,7 @@ AttrSetterColorAlpha::AttrSetterColorAlpha(unsigned char alpha) :
 
 void AttrSetterColorAlpha::set(Element* element)
 {
-	
+	element->setAlpha(m_alpha);
 }
 
 AttrSetterPaddingLeft::AttrSetterPaddingLeft(float paddingLeft) :
@@ -150,7 +153,7 @@ AttrSetterPaddingLeft::AttrSetterPaddingLeft(float paddingLeft) :
 
 void AttrSetterPaddingLeft::set(Element* element)
 {
-	
+	element->setPaddingLeft(m_paddingLeft);
 }
 
 AttrSetterPaddingRight::AttrSetterPaddingRight(float paddingRight) :
@@ -161,7 +164,7 @@ AttrSetterPaddingRight::AttrSetterPaddingRight(float paddingRight) :
 
 void AttrSetterPaddingRight::set(Element* element)
 {
-	
+	element->setPaddingRight(m_paddingRight);
 }
 
 AttrSetterPaddingTop::AttrSetterPaddingTop(float paddingTop) :
@@ -172,7 +175,7 @@ AttrSetterPaddingTop::AttrSetterPaddingTop(float paddingTop) :
 
 void AttrSetterPaddingTop::set(Element* element)
 {
-	
+	element->setPaddingTop(m_paddingTop);
 }
 
 AttrSetterPaddingBottom::AttrSetterPaddingBottom(float paddingBottom) :
@@ -183,7 +186,7 @@ AttrSetterPaddingBottom::AttrSetterPaddingBottom(float paddingBottom) :
 
 void AttrSetterPaddingBottom::set(Element* element)
 {
-	
+	element->setPaddingBottom(m_paddingBottom);
 }
 
 AttrSetterBackgroundImage::AttrSetterBackgroundImage(Texture* backgroundImage) :
@@ -194,7 +197,7 @@ AttrSetterBackgroundImage::AttrSetterBackgroundImage(Texture* backgroundImage) :
 
 void AttrSetterBackgroundImage::set(Element* element)
 {
-	
+	element->setBackgroundImage(m_backgroundImage);
 }
 
 AttrSetterBackgroundRepeat::AttrSetterBackgroundRepeat(Background::Repeat backgroundRepeat) :
@@ -205,7 +208,7 @@ AttrSetterBackgroundRepeat::AttrSetterBackgroundRepeat(Background::Repeat backgr
 
 void AttrSetterBackgroundRepeat::set(Element* element)
 {
-	
+	element->setBackgroundRepeat(m_backgroundRepeat);
 }
 
 AttrSetterOnMouseDown::AttrSetterOnMouseDown(int onMouseDown) :
@@ -216,7 +219,7 @@ AttrSetterOnMouseDown::AttrSetterOnMouseDown(int onMouseDown) :
 
 void AttrSetterOnMouseDown::set(Element* element)
 {
-	
+	element->setOnMouseDown(m_onMouseDown);
 }
 
 AttrSetterOnMouseUp::AttrSetterOnMouseUp(int onMouseUp) :
@@ -227,7 +230,7 @@ AttrSetterOnMouseUp::AttrSetterOnMouseUp(int onMouseUp) :
 
 void AttrSetterOnMouseUp::set(Element* element)
 {
-	
+	element->setOnMouseUp(m_onMouseUp);
 }
 
 AttrSetterOnMouseOver::AttrSetterOnMouseOver(int onMouseOver) :
@@ -238,7 +241,7 @@ AttrSetterOnMouseOver::AttrSetterOnMouseOver(int onMouseOver) :
 
 void AttrSetterOnMouseOver::set(Element* element)
 {
-	
+	element->setOnMouseOver(m_onMouseOver);
 }
 
 AttrSetterOnMouseOut::AttrSetterOnMouseOut(int onMouseOut) :
@@ -249,7 +252,7 @@ AttrSetterOnMouseOut::AttrSetterOnMouseOut(int onMouseOut) :
 
 void AttrSetterOnMouseOut::set(Element* element)
 {
-	
+	element->setOnMouseOut(m_onMouseOut);
 }
 
 AttrSetterOnMouseMove::AttrSetterOnMouseMove(int onMouseMove) :
@@ -260,7 +263,7 @@ AttrSetterOnMouseMove::AttrSetterOnMouseMove(int onMouseMove) :
 
 void AttrSetterOnMouseMove::set(Element* element)
 {
-	
+	element->setOnMouseMove(m_onMouseMove);
 }
 
 }

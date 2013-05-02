@@ -1,5 +1,5 @@
 <block>
-	<slider />
+	<slider aa="bb" />
 	<slider />
 	<slider />
 	<slider />

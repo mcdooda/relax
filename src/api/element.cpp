@@ -126,11 +126,12 @@ int style(lua_State* L)
 		{
 			std::string attrName = luaL_checkstring(L, -2);
 			std::string attrValue = luaL_checkstring(L, -1);
+			AttrSetter* attrSetter = Element::getAttrSetter(attrName, attrValue);
 			for (std::set<Element*>::iterator it = elements.begin(); it != elements.end(); it++)
 			{
-				// TODO: optimize loading of lua code (1 per attribute instead of 1 per element per attribute)
-				(*it)->setAttribute(attrName, attrValue);
+				attrSetter->set(*it);
 			}
+			delete attrSetter;
 			lua_pop(L, 1);
 		}
 		lua_pop(L, 1);
