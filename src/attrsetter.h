@@ -18,17 +18,29 @@ class AttrSetter
 		virtual void set(Element* element) = 0;
 };
 
+template <int N>
 class AttrSetterList : public AttrSetter
 {
 	public:
-		virtual ~AttrSetterList();
+		virtual ~AttrSetterList()
+		{
+			for (int i = 0; i < N; i++)
+				delete m_setters[i];
+		}
 	
-		virtual void set(Element* element);
+		virtual void set(Element* element)
+		{
+			for (int i = 0; i < N; i++)
+				m_setters[i]->set(element);
+		}
 		
-		void add(AttrSetter* setter);
+		void add(int index, AttrSetter* setter)
+		{
+			m_setters[index] = setter;
+		}
 		
 	private:
-		std::list<AttrSetter*> m_setters;
+		AttrSetter* m_setters[N];
 };
 
 class AttrSetterAnchorX : public AttrSetter

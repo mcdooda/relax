@@ -4,27 +4,6 @@
 namespace relax
 {
 
-void AttrSetterList::set(Element* element)
-{
-	for (std::list<AttrSetter*>::iterator it = m_setters.begin(); it != m_setters.end(); it++)
-	{
-		(*it)->set(element);
-	}
-}
-
-AttrSetterList::~AttrSetterList()
-{
-	for (std::list<AttrSetter*>::iterator it = m_setters.begin(); it != m_setters.end(); it++)
-	{
-		delete *it;
-	}
-}
-
-void AttrSetterList::add(AttrSetter* setter)
-{
-	m_setters.push_back(setter);
-}
-
 AttrSetterAnchorX::AttrSetterAnchorX(Anchor anchorX) :
 	m_anchorX(anchorX)
 {

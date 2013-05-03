@@ -29,6 +29,8 @@ void Relax::init(lua_State* L1)
 	memset(justPressedKeys, 0, sizeof(justPressedKeys));
 	memset(justReleasedKeys, 0, sizeof(justReleasedKeys));
 	
+	L = L1;
+	
 	Element::init();
 	Texture::init();
 	Font::init();
@@ -36,7 +38,6 @@ void Relax::init(lua_State* L1)
 	over = NULL;
 	previousOver = NULL;
 	
-    L = L1;
     api::element::open(L);
     api::mouse::open(L);
 }

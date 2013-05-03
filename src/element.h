@@ -72,11 +72,11 @@ class Element
 		inline void setBackgroundRepeat(Background::Repeat backgroundRepeat) { if (m_background == NULL) m_background = new Background(); m_background->setRepeat(backgroundRepeat); }
 		inline Background* getBackground() const { return m_background; }
 		
-		inline void setOnMouseDown(int onMouseDown) { m_onMouseDown = onMouseDown; }
-		inline void setOnMouseUp(int onMouseUp) { m_onMouseUp = onMouseUp; }
-		inline void setOnMouseOver(int onMouseOver) { m_onMouseOver = onMouseOver; }
-		inline void setOnMouseOut(int onMouseOut) { m_onMouseOut = onMouseOut; }
-		inline void setOnMouseMove(int onMouseMove) { m_onMouseMove = onMouseMove; }
+		inline void setOnMouseDown(int onMouseDown) { setEventHandler(&m_onMouseDown, onMouseDown); }
+		inline void setOnMouseUp(int onMouseUp) { setEventHandler(&m_onMouseUp, onMouseUp); }
+		inline void setOnMouseOver(int onMouseOver) { setEventHandler(&m_onMouseOver, onMouseOver); }
+		inline void setOnMouseOut(int onMouseOut) { setEventHandler(&m_onMouseOut, onMouseOut); }
+		inline void setOnMouseMove(int onMouseMove) { setEventHandler(&m_onMouseMove, onMouseMove); }
 		
 		void setAttribute(std::string attrName, std::string attrValue);
 		
@@ -125,6 +125,7 @@ class Element
 		void draw();
 		void updatePosition();
 		
+		void setEventHandler(int* handler, int ref);
 		void handleEvent(int handler);
 		
 		static void init();

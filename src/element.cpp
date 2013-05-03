@@ -6,11 +6,14 @@
 #include "xml.h"
 #include "api/element.h"
 #include "attrsetter.h"
+#include "luadebug.h"
 
 namespace relax
 {
 
-std::map<std::string, Element::AttrParser> attrParsers;
+static std::map<std::string, Element::AttrParser> attrParsers;
+
+static int cacheTable;
 
 Element::Element(std::string tag) :
 	m_tag(tag),
@@ -247,6 +250,18 @@ void Element::updatePosition()
 		(*it)->updatePosition();
 }
 
+void Element::setEventHandler(int* handler, int ref)
+{
+	lua_State* L = Relax::getLuaState();
+	luaL_unref(L, LUA_REGISTRYINDEX, *handler);
+	lua_pushinteger(L, cacheTable);
+	lua_rawget(L, LUA_REGISTRYINDEX);
+	lua_pushinteger(L, ref);
+	lua_rawget(L, -2);
+	*handler = luaL_ref(L, LUA_REGISTRYINDEX);
+	lua_pop(L, 1);
+}
+
 void Element::handleEvent(int handler)
 {
 	if (handler != LUA_NOREF)
@@ -255,7 +270,6 @@ void Element::handleEvent(int handler)
 		lua_pushinteger(L, handler);
 		lua_rawget(L, LUA_REGISTRYINDEX);
 		api::element::newRef(L, this);
-		//lua_pushlightuserdata(L, this);
 		int code = lua_pcall(L, 1, 0, 0);
 		checkLuaError(L, code);
 	}
@@ -296,6 +310,14 @@ void Element::init()
 	attrParsers["onmouseover"] = &Element::setAttrOnMouseOver;
 	attrParsers["onmouseout"] = &Element::setAttrOnMouseOut;
 	attrParsers["onmousemove"] = &Element::setAttrOnMouseMove;
+	
+	lua_State* L = Relax::getLuaState();
+	lua_newtable(L);
+	cacheTable = luaL_ref(L, LUA_REGISTRYINDEX);
+	lua_newtable(L);
+	lua_pushstring(L, "v");
+	lua_setfield(L, -2, "__mode");
+	lua_setmetatable(L, -2);
 }
 
 void Element::quit()
@@ -332,9 +354,9 @@ AttrSetter* Element::setAttrAnchor(std::string attrValue)
 	std::istringstream ss(attrValue);
 	ss >> anchorX;
 	ss >> anchorY;
-	AttrSetterList* attrSetter = new AttrSetterList();
-	attrSetter->add(setAttrAnchorX(anchorX));
-	attrSetter->add(setAttrAnchorY(anchorY));
+	AttrSetterList<2>* attrSetter = new AttrSetterList<2>();
+	attrSetter->add(0, setAttrAnchorX(anchorX));
+	attrSetter->add(1, setAttrAnchorY(anchorY));
 	return attrSetter;
 }
 
@@ -380,9 +402,9 @@ AttrSetter* Element::setAttrSize(std::string attrValue)
 	std::istringstream ss(attrValue);
 	ss >> width;
 	ss >> height;
-	AttrSetterList* attrSetter = new AttrSetterList();
-	attrSetter->add(setAttrSizeX(width));
-	attrSetter->add(setAttrSizeY(height));
+	AttrSetterList<2>* attrSetter = new AttrSetterList<2>();
+	attrSetter->add(0, setAttrSizeX(width));
+	attrSetter->add(1, setAttrSizeY(height));
 	return attrSetter;
 }
 
@@ -429,9 +451,9 @@ AttrSetter* Element::setAttrPosition(std::string attrValue)
 	if (ss.fail())
 		throw Exception();
 		
-	AttrSetterList* attrSetter = new AttrSetterList();
-	attrSetter->add(new AttrSetterPositionX(x));
-	attrSetter->add(new AttrSetterPositionY(y));
+	AttrSetterList<2>* attrSetter = new AttrSetterList<2>();
+	attrSetter->add(0, new AttrSetterPositionX(x));
+	attrSetter->add(1, new AttrSetterPositionY(y));
 	return attrSetter;
 }
 
@@ -468,11 +490,11 @@ AttrSetter* Element::setAttrColor(std::string attrValue)
 	if (ss.fail())
 		throw Exception();
 		
-	AttrSetterList* attrSetter = new AttrSetterList();
-	attrSetter->add(new AttrSetterColorRed(r));
-	attrSetter->add(new AttrSetterColorGreen(g));
-	attrSetter->add(new AttrSetterColorBlue(b));
-	attrSetter->add(new AttrSetterColorAlpha(a));
+	AttrSetterList<4>* attrSetter = new AttrSetterList<4>();
+	attrSetter->add(0, new AttrSetterColorRed(r));
+	attrSetter->add(1, new AttrSetterColorGreen(g));
+	attrSetter->add(2, new AttrSetterColorBlue(b));
+	attrSetter->add(3, new AttrSetterColorAlpha(a));
 	return attrSetter;
 }
 
@@ -531,11 +553,11 @@ AttrSetter* Element::setAttrPadding(std::string attrValue)
 	if (ss.fail())
 		throw Exception();
 		
-	AttrSetterList* attrSetter = new AttrSetterList();
-	attrSetter->add(new AttrSetterPaddingTop(paddingTop));
-	attrSetter->add(new AttrSetterPaddingLeft(paddingLeft));
-	attrSetter->add(new AttrSetterPaddingRight(paddingRight));
-	attrSetter->add(new AttrSetterPaddingBottom(paddingBottom));
+	AttrSetterList<4>* attrSetter = new AttrSetterList<4>();
+	attrSetter->add(0, new AttrSetterPaddingTop(paddingTop));
+	attrSetter->add(1, new AttrSetterPaddingLeft(paddingLeft));
+	attrSetter->add(2, new AttrSetterPaddingRight(paddingRight));
+	attrSetter->add(3, new AttrSetterPaddingBottom(paddingBottom));
 	return attrSetter;
 }
 
@@ -592,9 +614,9 @@ AttrSetter* Element::setAttrBackground(std::string attrValue)
 	if (ss.fail())
 		throw Exception();
 		
-	AttrSetterList* attrSetter = new AttrSetterList();
-	attrSetter->add(setAttrBackgroundImage(backgroundImage));
-	attrSetter->add(setAttrBackgroundRepeat(backgroundRepeat));
+	AttrSetterList<2>* attrSetter = new AttrSetterList<2>();
+	attrSetter->add(0, setAttrBackgroundImage(backgroundImage));
+	attrSetter->add(1, setAttrBackgroundRepeat(backgroundRepeat));
 	return attrSetter;
 }
 
@@ -622,13 +644,17 @@ AttrSetter* Element::setAttrBackgroundRepeat(std::string attrValue)
 int Element::parseEventHandler(std::string attrValue)
 {
 	lua_State* L = Relax::getLuaState();
+	lua_pushinteger(L, cacheTable);
+	lua_rawget(L, LUA_REGISTRYINDEX);
 	std::string fullCode = "local self = ...; " + attrValue;
-	std::cout << "compiling code: " << fullCode << std::endl;
 	int code = luaL_loadstring(L, fullCode.c_str());
 	checkLuaError(L, code);
 	if (code == LUA_OK)
-		return luaL_ref(L, LUA_REGISTRYINDEX);
-		
+	{
+		int ref = luaL_ref(L, -2);
+		lua_pop(L, 1);
+		return ref;
+	}
 	else
 		throw Exception();
 }
