@@ -50,25 +50,25 @@ static void characterData(void* userData, const char* s, int len)
 	{
 		std::stack<Element*>* stack = (std::stack<Element*>*) userData;
 		
-		Element* element = new Element("%string");
+		Element* top = stack->top();
 		
-		Font* font = Font::getDefault();
-		
-		if (!stack->empty())
+		if (top->containsText())
 		{
-			Element* top = stack->top();
-			top->addChild(element);
-			font = top->getFont();
+			Element* element = top->getTextElement();
+			Text* text = (Text*) element->getBackground()->getImage();
+			text->appendString(" " + str);
 		}
-		
-		Color color(0, 0, 0, 255);
-
-		const Rectangle& rectangle = element->getRectangle();
-		Text* text = new Text(font, color, rectangle);
-		text->appendString(str);
-		
-		Background* background = new Background(text);
-		element->setBackground(background);
+		else
+		{
+			Element* element = new Element("%string");
+			top->addChild(element);
+			const Rectangle& rectangle = element->getRectangle();
+			Color color(0, 0, 0, 255);
+			Text* text = new Text(top->getFont(), color, rectangle);
+			text->appendString(str);
+			Background* background = new Background(text);
+			element->setBackground(background);
+		}
 	}
 }
 

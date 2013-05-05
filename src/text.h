@@ -17,6 +17,7 @@ class Text : public Texture
 		
 		void appendString(const std::string& string);
 		
+		virtual bool isText() { return true; }
 		virtual void update(Element* element);
 		
 		inline const std::string& getString() const { return m_text; }

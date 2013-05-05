@@ -10,7 +10,7 @@ namespace element
 
 static const struct luaL_Reg lib_m[] = {
     {"__tostring",          toString},
-    {"getStringContent",    getStringContent},
+    {"getText",             getText},
     {"getTag",              getTag},
     {"setAttribute",        setAttribute},
     {"getSize",             getSize},
@@ -54,10 +54,10 @@ int toString(lua_State* L)
     return 1;
 }
 
-int getStringContent(lua_State* L)
+int getText(lua_State* L)
 {
 	Element* element = checkElement(L);
-	lua_pushstring(L, element->getStringContent().c_str());
+	lua_pushstring(L, element->getText().c_str());
 	return 1;
 }
 

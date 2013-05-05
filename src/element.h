@@ -77,10 +77,13 @@ class Element
 		void setBackgroundRepeat(BackgroundRepeat backgroundRepeat);
 		inline Background* getBackground() const { return m_background; }
 		
+		inline Element* getTextElement() { return *m_children.begin(); }
+		bool isText();
+		bool containsText();
+		std::string getText();
+		
 		inline Font* getFont() const { return m_font; }
 		inline void setFont(Font* font) { m_font = font; }
-		
-		const std::string& getStringContent() const;
 		
 		inline void setOnMouseDown(int onMouseDown) { setEventHandler(&m_onMouseDown, onMouseDown); }
 		inline void setOnMouseUp(int onMouseUp) { setEventHandler(&m_onMouseUp, onMouseUp); }

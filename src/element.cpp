@@ -75,26 +75,23 @@ void Element::setBackgroundRepeat(BackgroundRepeat backgroundRepeat)
 	m_background->setRepeat(backgroundRepeat);
 }
 
-const std::string& Element::getStringContent() const
+bool Element::isText()
 {
-	if (m_tag == "%string")
-	{
-		return ((Text*) m_background->getImage())->getString();
-	}
-	else if (m_children.size() == 1)
-	{
-		Element* child = *m_children.begin();
-		
-		if (child->m_tag != "%string")
-			throw Exception("Cannot get string content on element ");
+	return m_background != NULL && m_background->getImage()->isText();
+}
 
-		else
-			return ((Text*) child->getBackground()->getImage())->getString();
-	}
+bool Element::containsText()
+{
+	return m_children.size() == 1 && getTextElement()->isText();
+}
+
+std::string Element::getText()
+{
+	if (isText())
+		return ((Text*) m_background->getImage())->getString();
+		
 	else
-	{
-		throw Exception("Cannot get string content");
-	}
+		return "";
 }
 
 void Element::setAttribute(std::string attrName, std::string attrValue)

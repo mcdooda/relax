@@ -27,6 +27,12 @@ for k, e in pairs(element.getByTagName('slider')) do
 	y = y + 30
 end
 
+--[[
+for k, e in pairs(element.getByTagName('%string')) do
+	print(e:getText())
+end
+]]
+
 element.style {
 	relax = {
 		['padding'] = '100 100 100 100'

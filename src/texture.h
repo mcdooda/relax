@@ -20,6 +20,7 @@ class Texture
 		virtual ~Texture();
 		
 	public:
+		virtual bool isText() { return false; }
 		virtual void update(Element* element);
 		
 		inline Vector2 getSize() const { return m_size; }

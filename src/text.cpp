@@ -28,7 +28,6 @@ void Text::appendString(const std::string& string)
 void Text::update(Element* element)
 {
 	const Rectangle& rectangle = element->getRectangle();
-	std::cout << "rectangle " << rectangle.getWidth() << "x" << rectangle.getHeight() << std::endl;
 	if (rectangle.getWidth() > 0 && rectangle.getHeight() > 0)
 	{
 		SDL_Color sdlColor = { m_color.getBlue(), m_color.getGreen(), m_color.getRed() };
@@ -64,32 +63,31 @@ void Text::update(Element* element)
 		for (std::vector<std::string>::iterator it = tokens.begin(); it != tokens.end(); it++)
 		{
 			const char* token = it->c_str();
-			
-			int width, height;
-			TTF_SizeUTF8(font, token, &width, &height);
-			
-			if (pos.x > 0 && pos.x + width > rectangle.getWidth())
+			if (token[0] != '\0')
 			{
-				pos.x = 0;
-				pos.y += lineHeight;
+				int width, height;
+				TTF_SizeUTF8(font, token, &width, &height);
+			
+				if (pos.x > 0 && pos.x + width > rectangle.getWidth())
+				{
+					pos.x = 0;
+					pos.y += lineHeight;
+					if (pos.y > rectangle.getHeight())
+						break;
+				}
+			
+				SDL_Surface* tokenSurface = TTF_RenderUTF8_Blended(font, token, sdlColor);
+				SDL_BlitSurface(tokenSurface, NULL, surface, &pos);
+				SDL_FreeSurface(tokenSurface);
+			
+				pos.x += width + spaceWidth;
 			}
-			
-			SDL_Surface* tokenSurface = TTF_RenderUTF8_Blended(font, token, sdlColor);
-			SDL_BlitSurface(tokenSurface, NULL, surface, &pos);
-			SDL_FreeSurface(tokenSurface);
-			
-			pos.x += width + spaceWidth;
 		}
 		
 		loadSurface(surface);
 	
 		SDL_FreeSurface(surface);
-		
-		//element->setWidth(getWidth());
-		//element->setHeight(getHeight());
 	}
-	//else
-	//	std::cout << "empty rectangle!" << std::endl;
 }
 
 std::string Text::trim(const std::string& str)
