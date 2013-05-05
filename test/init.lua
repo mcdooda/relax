@@ -21,13 +21,24 @@ function clearSlider(e)
 	e:setAttribute('color', '0 0 255 255')
 end
 
-local y = 0
+local y = 240
 for k, e in pairs(element.getByTagName('slider')) do
 	e:setAttribute('position-y', y)
 	y = y + 30
 end
 
 element.style {
+	relax = {
+		['padding'] = '100 100 100 100'
+	},
+	title = {
+		['size-y'] = 20
+	},
+	lorem = {
+		['size-y']     = 200,
+		['position-y'] = 30,
+		['padding']    = '10 10 10 10'
+	},
 	slider = {
 		['size-y']       = 20,
 		['anchor']       = 'center top',
@@ -36,12 +47,12 @@ element.style {
 		['onmousemove']  = 'slider(self)',
 		['onmousedown']  = 'printSlider(self)',
 		['padding-left'] = 30,
-		['background']   = 'test/background.png repeat'
+		['background']   = 'test/background2.png repeat'
 	},
 	block = {
-		['color']   = '100 100 100 255',
+		['color']   = '200 80 100 255',
 		['padding'] = '20 20 20 20',
-		['size']    = '200 '..(y + 30),
+		['size-y']  = y + 30,
 		['anchor']  = 'center center'
 	}
 }

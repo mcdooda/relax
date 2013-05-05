@@ -2,6 +2,7 @@
 #include <GL/gl.h>
 #include "relax.h"
 #include "element.h"
+#include "text.h"
 #include "exception.h"
 #include "xml.h"
 #include "api/element.h"
@@ -20,6 +21,7 @@ Element::Element(std::string tag) :
 	m_parent(NULL),
 	m_anchor(TOP | LEFT),
 	m_background(NULL),
+	m_font(Font::getDefault()),
 	m_onMouseDown(LUA_NOREF),
 	m_onMouseUp(LUA_NOREF),
 	m_onMouseOver(LUA_NOREF),
@@ -49,6 +51,50 @@ void Element::addChild(Element* child)
 	child->m_parent = this;
 	m_children.push_back(child);
 	saveChildTag(child);
+}
+
+void Element::setBackground(Background* background)
+{
+	delete m_background;
+	m_background = background;
+}
+
+void Element::setBackgroundImage(Texture* backgroundImage)
+{
+	if (m_background == NULL)
+		m_background = new Background();
+		
+	m_background->setImage(backgroundImage);
+}
+
+void Element::setBackgroundRepeat(BackgroundRepeat backgroundRepeat)
+{
+	if (m_background == NULL)
+		m_background = new Background();
+		
+	m_background->setRepeat(backgroundRepeat);
+}
+
+const std::string& Element::getStringContent() const
+{
+	if (m_tag == "%string")
+	{
+		return ((Text*) m_background->getImage())->getString();
+	}
+	else if (m_children.size() == 1)
+	{
+		Element* child = *m_children.begin();
+		
+		if (child->m_tag != "%string")
+			throw Exception("Cannot get string content on element ");
+
+		else
+			return ((Text*) child->getBackground()->getImage())->getString();
+	}
+	else
+	{
+		throw Exception("Cannot get string content");
+	}
 }
 
 void Element::setAttribute(std::string attrName, std::string attrValue)
@@ -244,7 +290,7 @@ void Element::updatePosition()
 	m_rectangle.copyToVertices(m_vertices);
 	
 	if (m_background != NULL)
-		m_background->update(m_rectangle);
+		m_background->update(this);
 
 	for (std::list<Element*>::iterator it = m_children.begin(); it != m_children.end(); it++)
 		(*it)->updatePosition();
@@ -627,13 +673,13 @@ AttrSetter* Element::setAttrBackgroundImage(std::string attrValue)
 
 AttrSetter* Element::setAttrBackgroundRepeat(std::string attrValue)
 {
-	Background::Repeat backgroundRepeat;
+	BackgroundRepeat backgroundRepeat;
 	
 	if (attrValue == "scale")
-		backgroundRepeat = Background::SCALE;
+		backgroundRepeat = SCALE;
 		
 	else if (attrValue == "repeat")
-		backgroundRepeat = Background::REPEAT;
+		backgroundRepeat = REPEAT;
 		
 	else
 		throw Exception();

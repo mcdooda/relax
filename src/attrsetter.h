@@ -4,11 +4,14 @@
 #include <list>
 #include "element.h"
 #include "background.h"
+#include "backgroundrepeat.h"
 #include "anchor.h"
 
 namespace relax
 {
 class Element;
+class Background;
+class Texture;
 
 class AttrSetter
 {
@@ -225,12 +228,12 @@ class AttrSetterBackgroundImage : public AttrSetter
 class AttrSetterBackgroundRepeat : public AttrSetter
 {
 	public:
-		AttrSetterBackgroundRepeat(Background::Repeat backgroundRepeat);
+		AttrSetterBackgroundRepeat(BackgroundRepeat backgroundRepeat);
 		
 		virtual void set(Element* element);
 		
 	private:
-		Background::Repeat m_backgroundRepeat;
+		BackgroundRepeat m_backgroundRepeat;
 };
 
 class AttrSetterOnMouseDown : public AttrSetter

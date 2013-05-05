@@ -4,19 +4,24 @@
 #include <iostream>
 #include <SDL/SDL.h>
 #include <GL/gl.h>
+#include "element.h"
 #include "vector2.h"
+#include "rectangle.h"
 
 namespace relax
 {
+class Element;
 
 class Texture
 {
 	protected:
 		Texture();
 		Texture(std::string fileName);
-		~Texture();
+		virtual ~Texture();
 		
 	public:
+		virtual void update(Element* element);
+		
 		inline Vector2 getSize() const { return m_size; }
 		inline float getWidth() const { return m_size.getX(); }
 		inline float getHeight() const { return m_size.getY(); }
@@ -28,7 +33,7 @@ class Texture
 		static void init();
 		static void quit();
 		
-	private:
+	protected:
 		GLuint m_id;
 		Vector2 m_size;
 		

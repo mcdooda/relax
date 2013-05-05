@@ -113,6 +113,8 @@ Relax::Relax(Vector2 size, bool fullScreen, bool resizable) :
 	m_videoFlags(SDL_OPENGL),
 	m_open(true)
 {
+	saveTag(this);
+	
 	if (fullScreen)
 		m_videoFlags |= SDL_FULLSCREEN;
 		

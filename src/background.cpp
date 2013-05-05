@@ -4,20 +4,22 @@ namespace relax
 {
 
 Background::Background() :
+	m_image(NULL),
 	m_repeat(SCALE)
 {
 	initCoords();
 }
 
 Background::Background(Texture* image) :
+	m_image(image),
 	m_repeat(SCALE)
 {
     initCoords();
-	m_image = image;
 }
 
-void Background::update(const Rectangle& rectangle)
+void Background::update(Element* element)
 {
+	const Rectangle& rectangle = element->getRectangle();
 	switch (m_repeat)
 	{
 		case REPEAT:
@@ -41,6 +43,7 @@ void Background::update(const Rectangle& rectangle)
 		}
 		break;
 	}
+	m_image->update(element);
 }
 
 void Background::initCoords()

@@ -26,12 +26,14 @@ class Font
 		inline TTF_Font* getFont() const { return m_font; }
 		
 		static Font* get(Constr constr);
+		inline static Font* getDefault() { return defaultFont; }
 		
 		static void init();
 		static void quit();
 		
 	private:
 		TTF_Font* m_font;
+		static Font* defaultFont;
 };
 
 }

@@ -12,11 +12,15 @@
 #include "size.h"
 #include "rectangle.h"
 #include "background.h"
+#include "backgroundrepeat.h"
+#include "font.h"
 #include "anchor.h"
 #include "attrsetter.h"
 
 namespace relax
 {
+class Background;
+class Texture;
 	
 class Element
 {
@@ -46,6 +50,7 @@ class Element
 		inline Vector2 getComputedSize() const { return m_rectangle.getSize(); }
 		inline float getComputedWidth() const { return m_rectangle.getWidth(); }
 		inline float getComputedHeight() const { return m_rectangle.getHeight(); }
+		inline const Rectangle& getRectangle() const { return m_rectangle; }
 		
 		inline void setPosition(Vector2 position) { m_relativePosition = position; }
 		inline void setX(float x) { m_relativePosition.setX(x); }
@@ -67,10 +72,15 @@ class Element
 		inline void setPaddingBottom(float paddingBottom) { m_padding.setBottom(paddingBottom); }
 		inline Padding getPadding() const { return m_padding; }
 		
-		inline void setBackground(Background* background) { delete m_background; m_background = background; }
-		inline void setBackgroundImage(Texture* backgroundImage) { if (m_background == NULL) m_background = new Background(); m_background->setImage(backgroundImage); }
-		inline void setBackgroundRepeat(Background::Repeat backgroundRepeat) { if (m_background == NULL) m_background = new Background(); m_background->setRepeat(backgroundRepeat); }
+		void setBackground(Background* background);
+		void setBackgroundImage(Texture* backgroundImage);
+		void setBackgroundRepeat(BackgroundRepeat backgroundRepeat);
 		inline Background* getBackground() const { return m_background; }
+		
+		inline Font* getFont() const { return m_font; }
+		inline void setFont(Font* font) { m_font = font; }
+		
+		const std::string& getStringContent() const;
 		
 		inline void setOnMouseDown(int onMouseDown) { setEventHandler(&m_onMouseDown, onMouseDown); }
 		inline void setOnMouseUp(int onMouseUp) { setEventHandler(&m_onMouseUp, onMouseUp); }
@@ -110,6 +120,7 @@ class Element
 		Size m_size;
 		Padding m_padding;
 		Background* m_background;
+		Font* m_font;
 		float m_vertices[8];
 		
 		// lua callbacks

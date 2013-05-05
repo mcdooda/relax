@@ -5,6 +5,7 @@
 #include <expat.h>
 #include "xml.h"
 #include "element.h"
+#include "text.h"
 #include "exception.h"
 
 namespace relax
@@ -43,7 +44,32 @@ static void endElement(void* userData, const char* name)
 
 static void characterData(void* userData, const char* s, int len)
 {
-	//std::stack<Element*>* stack = (std::stack<Element*>*) userData;
+	std::string str(s, len);
+	str = Text::trim(str);
+	if (str != "")
+	{
+		std::stack<Element*>* stack = (std::stack<Element*>*) userData;
+		
+		Element* element = new Element("%string");
+		
+		Font* font = Font::getDefault();
+		
+		if (!stack->empty())
+		{
+			Element* top = stack->top();
+			top->addChild(element);
+			font = top->getFont();
+		}
+		
+		Color color(0, 0, 0, 255);
+
+		const Rectangle& rectangle = element->getRectangle();
+		Text* text = new Text(font, color, rectangle);
+		text->appendString(str);
+		
+		Background* background = new Background(text);
+		element->setBackground(background);
+	}
 }
 
 static void parseString(const char* xml, void* userData, bool addFakeRoot = false)

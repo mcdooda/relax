@@ -8,7 +8,8 @@ namespace relax
 
 std::map<std::string, Texture*> textures;
 
-Texture::Texture()
+Texture::Texture() :
+	m_id(0)
 {
 	
 }
@@ -28,6 +29,11 @@ Texture::Texture(std::string fileName)
 Texture::~Texture()
 {
 	glDeleteTextures(1, &m_id);
+}
+
+void Texture::update(Element* element)
+{
+	
 }
 
 Texture* Texture::get(std::string fileName)
@@ -62,7 +68,9 @@ void Texture::quit()
 
 void Texture::loadSurface(SDL_Surface* surface)
 {
+	glDeleteTextures(1, &m_id);
 	glGenTextures(1, &m_id);
+	
 	glBindTexture(GL_TEXTURE_2D, m_id);
 	
 	GLenum flag = GL_RGBA;

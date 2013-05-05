@@ -179,7 +179,7 @@ void AttrSetterBackgroundImage::set(Element* element)
 	element->setBackgroundImage(m_backgroundImage);
 }
 
-AttrSetterBackgroundRepeat::AttrSetterBackgroundRepeat(Background::Repeat backgroundRepeat) :
+AttrSetterBackgroundRepeat::AttrSetterBackgroundRepeat(BackgroundRepeat backgroundRepeat) :
 	m_backgroundRepeat(backgroundRepeat)
 {
 	

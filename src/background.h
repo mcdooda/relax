@@ -1,21 +1,18 @@
 #ifndef RELAX_BACKGROUND_H
 #define RELAX_BACKGROUND_H
 
+#include "backgroundrepeat.h"
 #include "texture.h"
 #include "rectangle.h"
+#include "element.h"
 
 namespace relax
 {
+class Element;
+class Texture;
 
 class Background
-{
-	public:
-		enum Repeat
-		{
-			REPEAT,
-			SCALE
-		};
-		
+{	
 	public:
 		Background();
 		Background(Texture* image);
@@ -23,16 +20,16 @@ class Background
 		inline void setImage(Texture* image) { m_image = image; }
 		inline Texture* getImage() const { return m_image; }
 		
-		inline void setRepeat(Repeat repeat) { m_repeat = repeat; }
-		inline Repeat getRepeat() const { return m_repeat; }
+		inline void setRepeat(BackgroundRepeat repeat) { m_repeat = repeat; }
+		inline BackgroundRepeat getRepeat() const { return m_repeat; }
 		
 		inline const float* getTextureCoords() const { return m_textureCoords; }
 		
-		void update(const Rectangle& rectangle);
+		void update(Element* element);
 	
 	private:
 		Texture* m_image;
-		Repeat m_repeat;
+		BackgroundRepeat m_repeat;
 		float m_textureCoords[8];
 		
 	private:
