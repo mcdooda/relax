@@ -38,12 +38,14 @@ element.style {
 		['padding'] = '100 100 100 100'
 	},
 	title = {
-		['size-y'] = 20
+		['size-y'] = 20,
+		['color']  = '128 128 128 255'
 	},
 	lorem = {
 		['size-y']     = 200,
 		['position-y'] = 30,
-		['padding']    = '10 10 10 10'
+		['padding']    = '10 10 10 10',
+		['color']      = '255 0 255 255'
 	},
 	slider = {
 		['size-y']       = 20,

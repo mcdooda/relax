@@ -30,8 +30,6 @@ void Text::update(Element* element)
 	const Rectangle& rectangle = element->getRectangle();
 	if (rectangle.getWidth() > 0 && rectangle.getHeight() > 0)
 	{
-		SDL_Color sdlColor = { m_color.getBlue(), m_color.getGreen(), m_color.getRed() };
-		
 		Uint32 rmask, gmask, bmask, amask;
 
 		#if SDL_BYTEORDER == SDL_BIG_ENDIAN
@@ -47,9 +45,11 @@ void Text::update(Element* element)
 		#endif
 		
 		SDL_Surface* surface = SDL_CreateRGBSurface(SDL_SWSURFACE | SDL_SRCALPHA, (int) rectangle.getWidth(), (int) rectangle.getHeight(), 32, rmask, gmask, bmask, amask);
-		SDL_FillRect(surface, NULL, SDL_MapRGBA(surface->format, 255, 255, 255, 128));
+		SDL_FillRect(surface, NULL, SDL_MapRGBA(surface->format, 0, 0, 0, 0));
 		
 		TTF_Font* font = m_font->getFont();
+		
+		SDL_Color sdlColor = { m_color.getBlue(), m_color.getGreen(), m_color.getRed() };
 		
 		std::vector<std::string> tokens = splitTokens(m_text);
 		
@@ -77,6 +77,7 @@ void Text::update(Element* element)
 				}
 			
 				SDL_Surface* tokenSurface = TTF_RenderUTF8_Blended(font, token, sdlColor);
+				SDL_SetAlpha(tokenSurface, 0, SDL_ALPHA_OPAQUE);
 				SDL_BlitSurface(tokenSurface, NULL, surface, &pos);
 				SDL_FreeSurface(tokenSurface);
 			
