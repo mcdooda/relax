@@ -1,4 +1,5 @@
 #include <sstream>
+#include <algorithm>
 #include <GL/gl.h>
 #include "relax.h"
 #include "element.h"
@@ -227,7 +228,7 @@ void Element::draw()
 	}
 }
 
-void Element::updatePosition()
+void Element::updatePosition(Element* previousElement)
 {
 	if (m_parent != NULL)
 	{
@@ -235,37 +236,51 @@ void Element::updatePosition()
 		
 		// x size
 		if (m_size.getWidthAuto())
-			computedSize.setX(m_parent->getComputedWidth() - m_parent->m_padding.getLeft() - m_parent->m_padding.getRight());
+			computedSize.setX(m_parent->getComputedWidth() - m_margin.getLeft() - m_margin.getRight() - m_parent->m_padding.getLeft() - m_parent->m_padding.getRight());
 			
 		else
 			computedSize.setX(m_size.getWidth());
 		
 		// y size
 		if (m_size.getHeightAuto())
-			computedSize.setY(m_parent->getComputedHeight() - m_parent->m_padding.getTop() - m_parent->m_padding.getBottom());
+			computedSize.setY(m_parent->getComputedHeight() - m_margin.getTop() - m_margin.getBottom() - m_parent->m_padding.getTop() - m_parent->m_padding.getBottom());
 			
 		else
 			computedSize.setY(m_size.getHeight());
 			
 		// x position
 		if ((m_anchor & LEFT) == LEFT)
-			m_rectangle.setLeft(m_parent->m_rectangle.getLeft() + m_relativePosition.getX() + m_parent->m_padding.getLeft());
+			m_rectangle.setLeft(m_parent->m_rectangle.getLeft() + m_margin.getLeft() + m_relativePosition.getX() + m_parent->m_padding.getLeft());
 			
 		else if ((m_anchor & RIGHT) == RIGHT)
-			m_rectangle.setLeft(m_parent->m_rectangle.getRight() + m_relativePosition.getX() - computedSize.getX() - m_parent->m_padding.getRight());
+			m_rectangle.setLeft(m_parent->m_rectangle.getRight() + m_margin.getLeft() + m_relativePosition.getX() - computedSize.getX() - m_parent->m_padding.getRight());
 			
 		else if ((m_anchor & CENTERX) == CENTERX)
 			m_rectangle.setLeft(m_parent->m_rectangle.getCenterX() - m_parent->m_padding.getCenterX() + m_parent->m_padding.getLeft() + m_relativePosition.getX() - computedSize.getX() / 2);
 			
 		// y position
-		if ((m_anchor & TOP) == TOP)
-			m_rectangle.setTop(m_parent->m_rectangle.getTop() + m_relativePosition.getY() + m_parent->m_padding.getTop());
+		if (previousElement != NULL)
+		{
+			if ((m_anchor & TOP) == TOP)
+				m_rectangle.setTop(previousElement->m_rectangle.getBottom() + std::max(m_margin.getTop(), previousElement->m_margin.getBottom()) + m_relativePosition.getY() - previousElement->m_relativePosition.getY());
+
+			else if ((m_anchor & BOTTOM) == BOTTOM)
+				m_rectangle.setTop(previousElement->m_rectangle.getTop() + std::max(m_margin.getBottom(), previousElement->m_margin.getTop()) + m_relativePosition.getY() - computedSize.getY() - previousElement->m_relativePosition.getY());
 			
-		else if ((m_anchor & BOTTOM) == BOTTOM)
-			m_rectangle.setTop(m_parent->m_rectangle.getBottom() + m_relativePosition.getY() - computedSize.getY() - m_parent->m_padding.getBottom());
+			else if ((m_anchor & CENTERY) == CENTERY)
+				m_rectangle.setTop(m_parent->m_rectangle.getCenterY() - m_parent->m_padding.getCenterY() + m_parent->m_padding.getTop() + m_relativePosition.getY() - computedSize.getY() / 2);
+		}
+		else
+		{
+			if ((m_anchor & TOP) == TOP)
+				m_rectangle.setTop(m_parent->m_rectangle.getTop() + m_relativePosition.getY() + m_parent->m_padding.getTop());
 			
-		else if ((m_anchor & CENTERY) == CENTERY)
-			m_rectangle.setTop(m_parent->m_rectangle.getCenterY() - m_parent->m_padding.getCenterY() + m_parent->m_padding.getTop() + m_relativePosition.getY() - computedSize.getY() / 2);
+			else if ((m_anchor & BOTTOM) == BOTTOM)
+				m_rectangle.setTop(m_parent->m_rectangle.getBottom() + m_relativePosition.getY() - computedSize.getY() - m_parent->m_padding.getBottom());
+			
+			else if ((m_anchor & CENTERY) == CENTERY)
+				m_rectangle.setTop(m_parent->m_rectangle.getCenterY() - m_parent->m_padding.getCenterY() + m_parent->m_padding.getTop() + m_relativePosition.getY() - computedSize.getY() / 2);
+		}
 			
 		m_rectangle.setRight(m_rectangle.getLeft() + computedSize.getX());
 		m_rectangle.setBottom(m_rectangle.getTop() + computedSize.getY());
@@ -289,8 +304,12 @@ void Element::updatePosition()
 	if (m_background != NULL)
 		m_background->update(this);
 
+	Element* previous = NULL;
 	for (std::list<Element*>::iterator it = m_children.begin(); it != m_children.end(); it++)
-		(*it)->updatePosition();
+	{
+		(*it)->updatePosition(previous);
+		previous = *it;
+	}
 }
 
 void Element::setEventHandler(int* handler, int ref)
@@ -343,6 +362,12 @@ void Element::init()
 	attrParsers["padding-right"] = &Element::setAttrPaddingRight;
 	attrParsers["padding-top"] = &Element::setAttrPaddingTop;
 	attrParsers["padding-bottom"] = &Element::setAttrPaddingBottom;
+	
+	attrParsers["margin"] = &Element::setAttrMargin;
+	attrParsers["margin-left"] = &Element::setAttrMarginLeft;
+	attrParsers["margin-right"] = &Element::setAttrMarginRight;
+	attrParsers["margin-top"] = &Element::setAttrMarginTop;
+	attrParsers["margin-bottom"] = &Element::setAttrMarginBottom;
 	
 	attrParsers["background"] = &Element::setAttrBackground;
 	attrParsers["background-image"] = &Element::setAttrBackgroundImage;
@@ -646,6 +671,69 @@ AttrSetter* Element::setAttrPaddingBottom(std::string attrValue)
 		throw Exception();
 		
 	return new AttrSetterPaddingBottom(paddingBottom);
+}
+
+AttrSetter* Element::setAttrMargin(std::string attrValue)
+{
+	float marginTop, marginLeft, marginRight, marginBottom;
+	std::istringstream ss(attrValue);
+	ss >> marginTop;
+	ss >> marginLeft;
+	ss >> marginRight;
+	ss >> marginBottom;
+	if (ss.fail())
+		throw Exception();
+		
+	AttrSetterList<4>* attrSetter = new AttrSetterList<4>();
+	attrSetter->add(0, new AttrSetterMarginTop(marginTop));
+	attrSetter->add(1, new AttrSetterMarginLeft(marginLeft));
+	attrSetter->add(2, new AttrSetterMarginRight(marginRight));
+	attrSetter->add(3, new AttrSetterMarginBottom(marginBottom));
+	return attrSetter;
+}
+
+AttrSetter* Element::setAttrMarginLeft(std::string attrValue)
+{
+	float marginLeft;
+	std::istringstream ss(attrValue);
+	ss >> marginLeft;
+	if (ss.fail())
+		throw Exception();
+		
+	return new AttrSetterMarginLeft(marginLeft);
+}
+
+AttrSetter* Element::setAttrMarginRight(std::string attrValue)
+{
+	float marginRight;
+	std::istringstream ss(attrValue);
+	ss >> marginRight;
+	if (ss.fail())
+		throw Exception();
+		
+	return new AttrSetterMarginRight(marginRight);
+}
+
+AttrSetter* Element::setAttrMarginTop(std::string attrValue)
+{
+	float marginTop;
+	std::istringstream ss(attrValue);
+	ss >> marginTop;
+	if (ss.fail())
+		throw Exception();
+		
+	return new AttrSetterMarginTop(marginTop);
+}
+
+AttrSetter* Element::setAttrMarginBottom(std::string attrValue)
+{
+	float marginBottom;
+	std::istringstream ss(attrValue);
+	ss >> marginBottom;
+	if (ss.fail())
+		throw Exception();
+		
+	return new AttrSetterMarginBottom(marginBottom);
 }
 
 AttrSetter* Element::setAttrBackground(std::string attrValue)

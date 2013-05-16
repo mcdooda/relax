@@ -168,6 +168,50 @@ void AttrSetterPaddingBottom::set(Element* element)
 	element->setPaddingBottom(m_paddingBottom);
 }
 
+AttrSetterMarginLeft::AttrSetterMarginLeft(float marginLeft) :
+	m_marginLeft(marginLeft)
+{
+	
+}
+
+void AttrSetterMarginLeft::set(Element* element)
+{
+	element->setMarginLeft(m_marginLeft);
+}
+
+AttrSetterMarginRight::AttrSetterMarginRight(float marginRight) :
+	m_marginRight(marginRight)
+{
+	
+}
+
+void AttrSetterMarginRight::set(Element* element)
+{
+	element->setMarginRight(m_marginRight);
+}
+
+AttrSetterMarginTop::AttrSetterMarginTop(float marginTop) :
+	m_marginTop(marginTop)
+{
+	
+}
+
+void AttrSetterMarginTop::set(Element* element)
+{
+	element->setMarginTop(m_marginTop);
+}
+
+AttrSetterMarginBottom::AttrSetterMarginBottom(float marginBottom) :
+	m_marginBottom(marginBottom)
+{
+	
+}
+
+void AttrSetterMarginBottom::set(Element* element)
+{
+	element->setMarginBottom(m_marginBottom);
+}
+
 AttrSetterBackgroundImage::AttrSetterBackgroundImage(Texture* backgroundImage) :
 	m_backgroundImage(backgroundImage)
 {

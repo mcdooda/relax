@@ -21,12 +21,6 @@ function clearSlider(e)
 	e:setAttribute('color', '0 0 255 255')
 end
 
-local y = 240
-for k, e in pairs(element.getByTagName('slider')) do
-	e:setAttribute('position-y', y)
-	y = y + 30
-end
-
 --[[
 for k, e in pairs(element.getByTagName('%string')) do
 	print(e:getText())
@@ -39,29 +33,33 @@ element.style {
 	},
 	title = {
 		['size-y'] = 20,
-		['color']  = '128 128 128 255'
+		['color']  = '128 128 128 255',
+		['margin'] = '0 0 0 0'
 	},
 	lorem = {
 		['size-y']     = 200,
-		['position-y'] = 30,
 		['padding']    = '10 10 10 10',
-		['color']      = '255 0 255 255'
+		['margin']     = '5 5 5 5',
+		['color']      = '255 0 255 255',
 	},
 	slider = {
-		['size-y']       = 20,
+		['size']         = '200 20',
 		['anchor']       = 'center top',
 		['color']        = '0 0 255 255',
 		['onmouseout']   = 'clearSlider(self)',
 		['onmousemove']  = 'slider(self)',
 		['onmousedown']  = 'printSlider(self)',
-		['padding-left'] = 30,
-		['background']   = 'test/background2.png repeat'
+		['background']   = 'test/background2.png repeat',
+		['margin-top']   = 5
 	},
 	block = {
 		['color']   = '200 80 100 255',
 		['padding'] = '20 20 20 20',
-		['size-y']  = y + 30,
 		['anchor']  = 'center center'
 	}
 }
+
+local sliders = element.getByTagName('slider')
+sliders[1]:setAttribute('anchor-x', 'left')
+sliders[3]:setAttribute('anchor-x', 'right')
 

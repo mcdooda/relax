@@ -51,7 +51,7 @@ class Relax : public Element
 		
 		virtual bool isMouseOver();
 		
-		inline void update() { updatePosition(); }
+		inline void update() { updatePosition(NULL); }
 		
 		void runScript(const char* fileName);
 		

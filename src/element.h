@@ -9,6 +9,7 @@
 #include "vector2.h"
 #include "color.h"
 #include "padding.h"
+#include "margin.h"
 #include "size.h"
 #include "rectangle.h"
 #include "background.h"
@@ -72,6 +73,13 @@ class Element
 		inline void setPaddingBottom(float paddingBottom) { m_padding.setBottom(paddingBottom); }
 		inline Padding getPadding() const { return m_padding; }
 		
+		inline void setMargin(Margin margin) { m_margin = margin; }
+		inline void setMarginLeft(float marginLeft) { m_margin.setLeft(marginLeft); }
+		inline void setMarginRight(float marginRight) { m_margin.setRight(marginRight); }
+		inline void setMarginTop(float marginTop) { m_margin.setTop(marginTop); }
+		inline void setMarginBottom(float marginBottom) { m_margin.setBottom(marginBottom); }
+		inline Margin getMargin() const { return m_margin; }
+		
 		void setBackground(Background* background);
 		void setBackgroundImage(Texture* backgroundImage);
 		void setBackgroundRepeat(BackgroundRepeat backgroundRepeat);
@@ -122,6 +130,7 @@ class Element
 		Color m_color;
 		Size m_size;
 		Padding m_padding;
+		Margin m_margin;
 		Background* m_background;
 		Font* m_font;
 		float m_vertices[8];
@@ -137,7 +146,7 @@ class Element
 		void saveChildTag(Element* child);
 		void renderChildren();
 		void draw();
-		void updatePosition();
+		void updatePosition(Element* previousElement);
 		
 		void setEventHandler(int* handler, int ref);
 		void handleEvent(int handler);
@@ -171,6 +180,12 @@ class Element
 		static AttrSetter* setAttrPaddingRight(std::string attrValue);
 		static AttrSetter* setAttrPaddingTop(std::string attrValue);
 		static AttrSetter* setAttrPaddingBottom(std::string attrValue);
+		
+		static AttrSetter* setAttrMargin(std::string attrValue);
+		static AttrSetter* setAttrMarginLeft(std::string attrValue);
+		static AttrSetter* setAttrMarginRight(std::string attrValue);
+		static AttrSetter* setAttrMarginTop(std::string attrValue);
+		static AttrSetter* setAttrMarginBottom(std::string attrValue);
 		
 		static AttrSetter* setAttrBackground(std::string attrValue);
 		static AttrSetter* setAttrBackgroundImage(std::string attrValue);

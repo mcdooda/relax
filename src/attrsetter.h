@@ -214,6 +214,50 @@ class AttrSetterPaddingBottom : public AttrSetter
 		float m_paddingBottom;
 };
 
+class AttrSetterMarginLeft : public AttrSetter
+{
+	public:
+		AttrSetterMarginLeft(float marginLeft);
+		
+		virtual void set(Element* element);
+		
+	private:
+		float m_marginLeft;
+};
+
+class AttrSetterMarginRight : public AttrSetter
+{
+	public:
+		AttrSetterMarginRight(float marginRight);
+		
+		virtual void set(Element* element);
+		
+	private:
+		float m_marginRight;
+};
+
+class AttrSetterMarginTop : public AttrSetter
+{
+	public:
+		AttrSetterMarginTop(float marginTop);
+		
+		virtual void set(Element* element);
+		
+	private:
+		float m_marginTop;
+};
+
+class AttrSetterMarginBottom : public AttrSetter
+{
+	public:
+		AttrSetterMarginBottom(float marginBottom);
+		
+		virtual void set(Element* element);
+		
+	private:
+		float m_marginBottom;
+};
+
 class AttrSetterBackgroundImage : public AttrSetter
 {
 	public:
