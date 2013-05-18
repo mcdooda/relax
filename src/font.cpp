@@ -42,7 +42,7 @@ void Font::init()
 		throw Exception(std::string("Error while loading SDL TTF: ") + TTF_GetError());
 	
 	Constr constr;
-	constr.fileName = "/usr/share/fonts/truetype/ubuntu-font-family/UbuntuMono-R.ttf";
+	constr.fileName = "/usr/share/fonts/truetype/freefont/FreeSans.ttf";
 	constr.size = 20;
 	
 	defaultFont = get(constr);
