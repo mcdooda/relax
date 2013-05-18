@@ -41,10 +41,10 @@ void Font::init()
 	if (TTF_Init() == -1)
 		throw Exception(std::string("Error while loading SDL TTF: ") + TTF_GetError());
 	
-	Constr constr = {
-		.fileName = "/usr/share/fonts/truetype/ubuntu-font-family/UbuntuMono-R.ttf",
-		.size = 20
-	};
+	Constr constr;
+	constr.fileName = "/usr/share/fonts/truetype/ubuntu-font-family/UbuntuMono-R.ttf";
+	constr.size = 20;
+	
 	defaultFont = get(constr);
 }
 
