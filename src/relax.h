@@ -32,10 +32,9 @@ class Relax : public Element
 		
 		/* public */
 		
-		Relax(Vector2 size = getDesktopResolution(), bool fullScreen = true, bool resizable = false);
+		Relax(Vector2 size = getDesktopResolution(), bool fullScreen = true, bool resizable = false, int fps = 60);
 		~Relax();
 		
-		void pumpEvents();
 		bool isPressed(Key key);
 		bool isJustPressed(Key key);
 		bool isJustReleased(Key key);
@@ -44,7 +43,7 @@ class Relax : public Element
 		bool isMouseJustReleased(int button);
 		inline static Vector2 getMouse() { return mouse; }
 		
-		bool operator!() const { return !m_open; }
+		bool operator!();
 		inline void close() { m_open = false; }
 		
 		virtual void render();
@@ -53,15 +52,21 @@ class Relax : public Element
 		
 		inline void update() { updatePosition(NULL); }
 		
+		float getElapsedTime();
+		
 		void runScript(const char* fileName);
 		
 	private:
 		/* attributes */
 		Uint32 m_videoFlags;
 		bool m_open;
+		int m_fps;
+		Uint32 m_lastUpdateTime;
+		Uint32 m_elapsedTime;
 		
 	private:
 		/* methods */
+		void pumpEvents();
 		void updateSize(Vector2 newSize);
 		
 		void checkMouseDown();

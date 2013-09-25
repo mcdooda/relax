@@ -21,8 +21,6 @@ int main(int argc, char* argv[])
 		
 		while (!!r)
 		{
-			r.pumpEvents();
-			
 			if (r.isPressed(K(ESCAPE)))
 				r.close();
 			

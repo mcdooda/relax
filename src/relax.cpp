@@ -38,8 +38,8 @@ void Relax::init(lua_State* L1)
 	over = NULL;
 	previousOver = NULL;
 	
-    api::element::open(L);
-    api::mouse::open(L);
+	api::element::open(L);
+	api::mouse::open(L);
 }
 
 void Relax::quit()
@@ -108,10 +108,13 @@ std::set<Element*> Relax::getElementsByTagName(std::string tag)
 		return std::set<Element*>();
 }
 
-Relax::Relax(Vector2 size, bool fullScreen, bool resizable) :
+Relax::Relax(Vector2 size, bool fullScreen, bool resizable, int fps) :
 	Element("relax"),
 	m_videoFlags(SDL_OPENGL),
-	m_open(true)
+	m_open(true),
+	m_fps(fps),
+	m_lastUpdateTime(0),
+	m_elapsedTime(0)
 {
 	saveTag(this);
 	
@@ -132,6 +135,21 @@ Relax::~Relax()
 	
 }
 
+bool Relax::operator!()
+{
+	pumpEvents();
+	Uint32 time = SDL_GetTicks();
+	m_elapsedTime = time - m_lastUpdateTime;
+	const Uint32 frameDuration = 1.f / m_fps * 1000;
+	if (m_elapsedTime < frameDuration)
+	{
+		SDL_Delay(frameDuration - m_elapsedTime);
+		m_elapsedTime = frameDuration;
+	}
+	m_lastUpdateTime = time;
+	return !m_open;
+}
+
 void Relax::render()
 {
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -143,6 +161,11 @@ void Relax::render()
 bool Relax::isMouseOver()
 {
 	return true;
+}
+
+float Relax::getElapsedTime()
+{
+	return (float)m_elapsedTime / 1000;
 }
 
 void Relax::pumpEvents()

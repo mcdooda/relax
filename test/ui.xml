@@ -8,6 +8,6 @@
 		deserunt mollit anim id est laborum.
 	</lorem>
 	<slider />
-	<slider />
-	<slider />
+	<slider anchor-x="center" />
+	<slider anchor-x="right" />
 </block>

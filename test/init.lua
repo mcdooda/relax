@@ -44,7 +44,7 @@ element.style {
 	},
 	slider = {
 		['size']         = '200 20',
-		['anchor']       = 'center top',
+		['anchor-y']     = 'top',
 		['color']        = '0 0 255 255',
 		['onmouseout']   = 'clearSlider(self)',
 		['onmousemove']  = 'slider(self)',
@@ -59,7 +59,9 @@ element.style {
 	}
 }
 
+--[[
 local sliders = element.getByTagName('slider')
 sliders[1]:setAttribute('anchor-x', 'left')
 sliders[3]:setAttribute('anchor-x', 'right')
+]]
 
