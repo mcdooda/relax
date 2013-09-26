@@ -9,49 +9,60 @@ namespace element
 {
 
 static const struct luaL_Reg lib_m[] = {
-    {"__tostring",          toString},
-    {"getText",             getText},
-    {"getTag",              getTag},
-    {"setAttribute",        setAttribute},
-    {"getSize",             getSize},
-    {"getAbsolutePosition", getAbsolutePosition},
-    {"getPosition",         getPosition},
-    {NULL, NULL}
+	{"__tostring",			toString},
+	{"__eq",				eq},
+	{"getText",				getText},
+	{"getTag",				getTag},
+	{"getParent",			getParent},
+	{"getChildren",			getChildren},
+	{"setAttribute",		setAttribute},
+	{"getSize",				getSize},
+	{"getAbsolutePosition",	getAbsolutePosition},
+	{"getPosition",			getPosition},
+	{NULL, NULL}
 };
 
 static const struct luaL_Reg lib_f[] = {
 	{"getByTagName", getByTagName},
-	{"style",        style},
+	{"style",		style},
 	{NULL, NULL}
 };
 
 void open(lua_State* L)
 {
-    luaL_newmetatable(L, "Relax.Element");
-    lua_pushvalue(L, -1);
-    lua_setfield(L, -2, "__index");
-    luaL_setfuncs(L, lib_m, 0);
-    lua_pop(L, 1);
-    
-    luaL_newlib(L, lib_f);
-    lua_setglobal(L, "element");
+	luaL_newmetatable(L, "Relax.Element");
+	lua_pushvalue(L, -1);
+	lua_setfield(L, -2, "__index");
+	luaL_setfuncs(L, lib_m, 0);
+	lua_pop(L, 1);
+	
+	luaL_newlib(L, lib_f);
+	lua_setglobal(L, "element");
 }
 
 void newRef(lua_State* L, Element* element)
 {
-    Element** e = (Element**) lua_newuserdata(L, sizeof(Element*));
-    luaL_getmetatable(L, "Relax.Element");
-    lua_setmetatable(L, -2);
-    *e = element;
+	Element** e = (Element**) lua_newuserdata(L, sizeof(Element*));
+	luaL_getmetatable(L, "Relax.Element");
+	lua_setmetatable(L, -2);
+	*e = element;
 }
 
 #define checkElement(L) (*(Element**) luaL_checkudata(L, 1, "Relax.Element"))
 
+int eq(lua_State* L)
+{
+	Element* element1 = checkElement(L);
+	Element* element2 = checkElement(L);
+	lua_pushboolean(L, element1 == element2);
+	return 1;
+}
+
 int toString(lua_State* L)
 {
-    Element* element = checkElement(L);
-    lua_pushfstring(L, "<%s /> (%p)", element->getTag().c_str(), element);
-    return 1;
+	Element* element = checkElement(L);
+	lua_pushfstring(L, "<%s /> (%p)", element->getTag().c_str(), element);
+	return 1;
 }
 
 int getText(lua_State* L)
@@ -63,9 +74,38 @@ int getText(lua_State* L)
 
 int getTag(lua_State* L)
 {
-    Element* element = checkElement(L);
-    lua_pushstring(L, element->getTag().c_str());
-    return 1;
+	Element* element = checkElement(L);
+	lua_pushstring(L, element->getTag().c_str());
+	return 1;
+}
+
+int getParent(lua_State* L)
+{
+	Element* element = checkElement(L);
+	Element* parent = element->getParent();
+	
+	if (parent == NULL)
+		lua_pushnil(L);
+		
+	else
+		newRef(L, parent);
+	
+	return 1;
+}
+
+int getChildren(lua_State* L)
+{
+	Element* element = checkElement(L);
+	const std::list<Element*>& children = element->getChildren();
+	lua_createtable(L, children.size(), 0);
+	int i = 1;
+	for (std::list<Element*>::const_iterator it = children.begin(); it != children.end(); it++)
+	{
+		newRef(L, *it);
+		lua_rawseti(L, -2, i);
+		i++;
+	}
+	return 1;
 }
 
 int setAttribute(lua_State* L)
@@ -112,9 +152,8 @@ int getByTagName(lua_State* L)
 	int i = 1;
 	for (std::set<Element*>::iterator it = elements.begin(); it != elements.end(); it++)
 	{
-		lua_pushinteger(L, i);
 		newRef(L, *it);
-		lua_rawset(L, -3);
+		lua_rawseti(L, -2, i);
 		i++;
 	}
 	return 1;

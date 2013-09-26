@@ -10,4 +10,16 @@
 	<slider />
 	<slider anchor-x="center" />
 	<slider anchor-x="right" />
+	<a />
+	<b>
+		<a />
+	</b>
+	<c>
+		<b>
+			<a />
+		</b>
+	</c>
+	<c>
+		<a />
+	</c>
 </block>

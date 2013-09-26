@@ -59,9 +59,15 @@ element.style {
 	}
 }
 
---[[
-local sliders = element.getByTagName('slider')
-sliders[1]:setAttribute('anchor-x', 'left')
-sliders[3]:setAttribute('anchor-x', 'right')
-]]
+
+local R = require 'test/R'
+
+print("R('slider')")
+print(R('slider'))
+print("R('a')")
+print(R('a'))
+print("R('b a, b, a')")
+print(R('b a, b, a'))
+print("R('b'):find('a')")
+print(R('b'):find('a'))
 

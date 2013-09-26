@@ -16,8 +16,12 @@ void open(lua_State* L);
 void newRef(lua_State* L, Element* element);
 
 int toString(lua_State* L);
+int eq(lua_State* L);
+
 int getText(lua_State* L);
 int getTag(lua_State* L);
+int getParent(lua_State* L);
+int getChildren(lua_State* L);
 int setAttribute(lua_State* L);
 int getSize(lua_State* L);
 int getAbsolutePosition(lua_State* L);
