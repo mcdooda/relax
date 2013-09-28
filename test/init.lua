@@ -64,10 +64,25 @@ local R = require 'test/R'
 
 print("R('slider')")
 print(R('slider'))
+
+print("R('b a')")
+print(R('b a'))
+
+print("R('b')")
+print(R('b'))
+
 print("R('a')")
 print(R('a'))
+
 print("R('b a, b, a')")
 print(R('b a, b, a'))
+
+print("R('c b')")
+print(R('c b'))
+
+print("R('c b'):find('a')")
+print(R('c b'):find('a'))
+
 print("R('b'):find('a')")
 print(R('b'):find('a'))
 

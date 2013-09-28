@@ -49,11 +49,12 @@ void newRef(lua_State* L, Element* element)
 }
 
 #define checkElement(L) (*(Element**) luaL_checkudata(L, 1, "Relax.Element"))
+#define checkElementIndex(L, index) (*(Element**) luaL_checkudata(L, index, "Relax.Element"))
 
 int eq(lua_State* L)
 {
 	Element* element1 = checkElement(L);
-	Element* element2 = checkElement(L);
+	Element* element2 = checkElementIndex(L, 2);
 	lua_pushboolean(L, element1 == element2);
 	return 1;
 }

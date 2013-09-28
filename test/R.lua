@@ -22,26 +22,6 @@ local function isAtom(e, atom)
 end
 
 
-local function findRecursive(e, atoms, index, set)
-	local atom = atoms[index]
-	if isAtom(e, atom) then
-		if index == #atoms then
-			set:add(e)
-		else
-			local children = e:getChildren()
-			for i = 1, #children do
-				findRecursive(children[i], atoms, index + 1, set)
-			end
-		end
-	else
-		local children = e:getChildren()
-		for i = 1, #children do
-			findRecursive(children[i], atoms, index, set)
-		end
-	end
-end
-
-
 local function splitSelectors(selector)
 	local selectors = {}
 	local i = 1
@@ -64,32 +44,77 @@ local function splitAtoms(selector)
 end
 
 
-local function find(selector)
+local function sameBranch(e, root)
+	while e and e ~= root do
+		e = e:getParent()
+	end
+	return e == root
+end
+
+
+local function matches(root, e, atoms, index)
+	local atom = atoms[index]
+	if not e then
+		return false
+	elseif isAtom(e, atom) then
+		if index == 1 then
+			if not root then
+				return true
+			else
+				return sameBranch(e, root)
+			end
+		else
+			return matches(root, e:getParent(), atoms, index - 1)
+		end
+	else
+		if root == e then
+			return false
+		else
+			return matches(root, e:getParent(), atoms, index)
+		end
+	end
+end
+
+
+function find(root, selector)
 	local result = ElementSet:new()
 	local selectors = splitSelectors(selector)
-	for i = 1, #selectors do
-		local atoms = splitAtoms(selectors[i])
-		local atomTag = getAtomTag(atoms[1])
-		for _, e in pairs(element.getByTagName(atomTag)) do
-			findRecursive(e, atoms, 1, result)
+	local numSelectors = #selectors
+	local tags = {}
+	for i = 1, numSelectors do
+		local selector = selectors[i]
+		local atoms = splitAtoms(selector)
+		local lastTag = getAtomTag(atoms[#atoms])
+		tags[lastTag] = true
+	end
+	for tag in pairs(tags) do
+		local elements = element.getByTagName(tag)
+		for i = 1, #elements do
+			local e = elements[i]
+			for j = 1, numSelectors do
+				local selector = selectors[j]
+				local atoms = splitAtoms(selector)
+				if matches(root, e, atoms, #atoms) then
+					result:add(e)
+				end
+			end
 		end
 	end
 	return result
 end
+
 
 setmetatable(R, {
 	
 	__call = function(R, ...)
 		local result = ElementSet:new()
 		local args = {...}
-		
 		for i = 1, #args do
 			local arg = args[i]
-			
 			if type(arg) == 'string' then
 				-- selector
 				local selector = arg
-				result = result + find(selector)
+				result = result + find(nil, selector)
 			elseif getmetatable(arg) == ElementSet then
 				-- set
 				result = result + arg
@@ -163,9 +188,11 @@ end
 
 function ElementSet:__tostring()
 	local output = {}
+	output[#output + 1] = #self .. ' elements ===='
 	self:each(function(e)
-		output[#output + 1] = elementToString(e)
+		output[#output + 1] = elementToString(e, true) .. '\t(' .. tostring(e) .. ')'
 	end)
+	output[#output + 1] = '============'
 	return table.concat(output, '\n')
 end
 
@@ -211,14 +238,10 @@ end
 
 
 function ElementSet:find(selector)
-	local result = ElementSet:new()
-	local selectors = splitSelectors(selector)
-	for i = 1, #selectors do
-		local atoms = splitAtoms(selectors[i])
-		self:each(function(e)
-			findRecursive(e, atoms, 1, result)
-		end)
-	end
+	local result = getmetatable(self):new()
+	self:each(function(e)
+		result = result + find(e, selector)
+	end)
 	return result
 end
 
